@@ -1,0 +1,22 @@
+{
+  "name": "script-manager",
+  "version": "0.0.1",
+  "authors": [
+    "Steve Calvert <scalvert@mobify.com>"
+  ],
+  "description": "Utility for managing and prioritizing scripts",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.1.15"
+  },
+  "devDependencies": {
+    "requirejs-text": "~2.0.14"
+  }
+}
