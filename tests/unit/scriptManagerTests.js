@@ -59,13 +59,34 @@ define([
             });
 
             it('returns custom container', function() {
-                scriptManager.add('urgent', {
+                scriptManager.add('custom', {
                     src: ['script4']
                 });
-                var customContainer = scriptManager.get('urgent');
+                var customContainer = scriptManager.get('custom');
 
                 expect(customContainer).to.be.defined;
                 expect(customContainer).to.have.length(1);
+            });
+        });
+
+        describe('Add', function() {
+            it('creates custom container with scripts', function() {
+                scriptManager.add('custom', {
+                    src: ['script4', 'script2']
+                });
+                var customContainer = scriptManager.get('custom');
+
+                expect(customContainer).to.have.length(2);
+            });
+
+            it('ensures order of scripts is maintained', function() {
+                scriptManager.add('custom', {
+                    src: ['script4', 'script2']
+                });
+                var customContainer = scriptManager.get('custom');
+
+                expect(customContainer[0].$script[0].attributes[0].value).to.equal('/script2.js');
+                expect(customContainer[1].$script[0].attributes[0].value).to.equal('/script4.js');
             });
         });
     });

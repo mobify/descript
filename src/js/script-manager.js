@@ -46,7 +46,7 @@
 
         for (var searchType in querySources) {
             if (querySources.hasOwnProperty(searchType)) {
-                var queries = querySources[searchType];
+                var queries = querySources[searchType].reverse();
                 var searcher = scriptSearchers[searchType];
 
                 for (var queryIndex = 0, queriesLength = queries.length; queryIndex < queriesLength; queryIndex++) {
@@ -56,14 +56,14 @@
                         var scriptItem = defaultContainer[scriptItemIndex];
 
                         if (searcher(scriptItem, queries[queryIndex])) {
-                            containerScripts.unshift(defaultContainer.splice(scriptItemIndex, 1));
+                            containerScripts[scriptItemIndex] = defaultContainer.splice(scriptItemIndex, 1)[0];
                         }
                     }
                 }
             }
         }
 
-        this._containers[containerName] = containerScripts;
+        this._containers[containerName] = containerScripts.filter(function(item) { return !!item; });
     };
 
     ScriptManager.prototype.get = function(containerName) {

@@ -37,28 +37,33 @@
                         $script: $script,
                         inline: !script.hasAttribute('x-src')
                     };
-                });
+                }).get();
     };
 
-    ScriptManager.prototype.add = function(containerName, sources) {
+    ScriptManager.prototype.add = function(containerName, querySources) {
         var defaultContainer = this._containers[DEFAULT_CONTAINER];
         var containerScripts = this._containers[containerName] || [];
 
-        for (var key in sources) {
-            if (sources.hasOwnProperty(key)) {
-                var searcher = scriptSearchers[key];
+        for (var searchType in querySources) {
+            if (querySources.hasOwnProperty(searchType)) {
+                var queries = querySources[searchType].reverse();
+                var searcher = scriptSearchers[searchType];
 
-                for (var i = 0; i < defaultContainer.length; i++) {
-                    var scriptItem = defaultContainer[i];
+                for (var queryIndex = 0, queriesLength = queries.length; queryIndex < queriesLength; queryIndex++) {
+                    var scriptItemIndex = defaultContainer.length;
 
-                    if (searcher(scriptItem, key)) {
-                        containerScripts.push(defaultContainer.splice(i, 1));
+                    while (scriptItemIndex--) {
+                        var scriptItem = defaultContainer[scriptItemIndex];
+
+                        if (searcher(scriptItem, queries[queryIndex])) {
+                            containerScripts[scriptItemIndex] = defaultContainer.splice(scriptItemIndex, 1);
+                        }
                     }
                 }
             }
         }
 
-        this._containers[containerName] = containerScripts;
+        this._containers[containerName] = containerScripts.filter(function(item) { return !!item; });
     };
 
     ScriptManager.prototype.get = function(containerName) {
