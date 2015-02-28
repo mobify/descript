@@ -39,16 +39,17 @@
                 }).get();
     };
 
-    ScriptManager.prototype.add = function(containerName, querySources) {
+    ScriptManager.prototype.add = function(containerName, scriptPatterns) {
         var defaultContainer = this._containers[DEFAULT_CONTAINER];
         var containerScripts = this._containers[containerName] || [];
 
-        for (var searchType in querySources) {
-            if (querySources.hasOwnProperty(searchType)) {
-                var queries = querySources[searchType].reverse();
+        for (var searchType in scriptPatterns) {
+            if (scriptPatterns.hasOwnProperty(searchType)) {
+                var queries = scriptPatterns[searchType].reverse();
                 var searcher = scriptSearchers[searchType];
+                var queryIndex = queries.length;
 
-                for (var queryIndex = 0, queriesLength = queries.length; queryIndex < queriesLength; queryIndex++) {
+                while (queryIndex--) {
                     var scriptItemIndex = defaultContainer.length;
 
                     while (scriptItemIndex--) {
