@@ -33,7 +33,6 @@ define([
             it('pre-processes inline scripts', function() {
                 var firstScript = scriptManager.get('default')[0];
 
-                expect(firstScript).to.have.property('container');
                 expect(firstScript).to.have.property('$script');
                 expect(firstScript).to.have.property('inline');
 
@@ -42,8 +41,7 @@ define([
 
             it('pre-processes external scripts', function() {
                 var firstScript = scriptManager.get('default')[1];
-
-                expect(firstScript).to.have.property('container');
+                
                 expect(firstScript).to.have.property('$script');
                 expect(firstScript).to.have.property('inline');
 

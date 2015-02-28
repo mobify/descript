@@ -33,7 +33,6 @@
                     var $script = $(script);
 
                     return {
-                        container: DEFAULT_CONTAINER,
                         $script: $script,
                         inline: !script.hasAttribute('x-src')
                     };
@@ -56,7 +55,7 @@
                         var scriptItem = defaultContainer[scriptItemIndex];
 
                         if (searcher(scriptItem, queries[queryIndex])) {
-                            containerScripts[scriptItemIndex] = defaultContainer.splice(scriptItemIndex, 1);
+                            containerScripts[scriptItemIndex] = defaultContainer.splice(scriptItemIndex, 1)[0];
                         }
                     }
                 }

@@ -33,7 +33,6 @@
                     var $script = $(script);
 
                     return {
-                        container: DEFAULT_CONTAINER,
                         $script: $script,
                         inline: !script.hasAttribute('x-src')
                     };
