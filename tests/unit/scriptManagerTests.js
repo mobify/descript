@@ -10,7 +10,7 @@ define([
             var setUpComplete = function(iFrame$, dependencies) {
                 $ = iFrame$;
                 ScriptManager = dependencies.ScriptManager;
-                scriptManager = new ScriptManager();
+                scriptManager = ScriptManager.init();
 
                 done();
             };
@@ -23,29 +23,17 @@ define([
                 expect(scriptManager).to.be.an.instanceOf(ScriptManager);
             });
 
+            it('creates only one instance', function() {
+                var otherScriptManager = ScriptManager.init();
+
+                expect(scriptManager).to.equal(otherScriptManager);
+            });
+
             it('pre-processes scripts into script array', function() {
                 var defaultContainer = scriptManager.get('default');
 
                 expect(defaultContainer).to.be.an('array');
                 expect(defaultContainer).to.have.length(17);
-            });
-
-            it('pre-processes inline scripts', function() {
-                var firstScript = scriptManager.get('default')[0];
-
-                expect(firstScript).to.have.property('$script');
-                expect(firstScript).to.have.property('inline');
-
-                expect(firstScript.inline).to.be.true;
-            });
-
-            it('pre-processes external scripts', function() {
-                var firstScript = scriptManager.get('default')[1];
-
-                expect(firstScript).to.have.property('$script');
-                expect(firstScript).to.have.property('inline');
-
-                expect(firstScript.inline).to.be.false;
             });
         });
 
@@ -83,8 +71,8 @@ define([
                 });
                 var customContainer = scriptManager.get('custom');
 
-                expect(customContainer[0].$script[0].attributes[0].value).to.equal('/script2.js');
-                expect(customContainer[1].$script[0].attributes[0].value).to.equal('/script4.js');
+                expect(customContainer[0].attributes[0].value).to.equal('/script2.js');
+                expect(customContainer[1].attributes[0].value).to.equal('/script4.js');
             });
         });
     });
