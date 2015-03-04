@@ -65,6 +65,19 @@ define([
                 expect(customContainer).to.have.length(2);
             });
 
+            it('chains calls when adding containers', function() {
+                var scripts = scriptManager
+                    .add('urgent', {
+                        src: ['script4', 'script2']
+                    })
+                    .add('delayed', {
+                        src: ['script14', 'script10']
+                    })
+                    .get();
+
+                expect(Object.keys(scripts)).to.have.length(3);
+            });
+
             it('ensures order of scripts is maintained', function() {
                 scriptManager.add('custom', {
                     src: ['script4', 'script2']
@@ -73,6 +86,24 @@ define([
 
                 expect(customContainer[0].attributes[0].value).to.equal('/script2.js');
                 expect(customContainer[1].attributes[0].value).to.equal('/script4.js');
+            });
+
+            it('segments scripts into three containers', function() {
+                scriptManager
+                    .add('urgent', {
+                        src: ['script4', 'script2']
+                    })
+                    .add('delayed', {
+                        src: ['script14', 'script10']
+                    });
+
+                var defaultContainer = scriptManager.get('default');
+                var urgentContainer = scriptManager.get('urgent');
+                var delayedContainer = scriptManager.get('delayed');
+
+                expect(defaultContainer).to.have.length(13);
+                expect(urgentContainer).to.have.length(2);
+                expect(delayedContainer).to.have.length(2);
             });
         });
     });

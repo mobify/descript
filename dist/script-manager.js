@@ -16,14 +16,14 @@
         src: function(script, query) {
             return script.hasAttribute('x-src') && $(script).is('[x-src*="' + query + '"]');
         },
-        contains : function(scriptItem, query) {
+        contains : function(script, query) {
             return !script.hasAttribute('x-src') && $(script).html().indexOf(query) >= 0;
         }
     };
 
     /**
-     * Initializes the script manager with a default container containing all the
-     * scripts on the page.
+     * Initializes the script manager with a default container containing
+     * all the scripts on the page.
      * @constructor
      */
     var ScriptManager = function() {
@@ -31,13 +31,17 @@
         this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]');
     };
 
+    /**
+     * Singleton function returning an instance of a script manager.
+     * @returns {*|ScriptManager}
+     */
     ScriptManager.init = function() {
         return instance || (instance = new ScriptManager());
     };
 
     /**
      * Adds scripts from the default container into the specified custom container.
-     * Ensures DOM order of scripts is preserved.
+     * Ensures DOM order of scripts is preserved. This method is chainable.
      * @param containerName
      * @param scriptPatterns
      */
@@ -55,9 +59,9 @@
                     var scriptItemIndex = defaultContainer.length;
 
                     while (scriptItemIndex--) {
-                        var scriptItem = defaultContainer[scriptItemIndex];
+                        var $script = defaultContainer[scriptItemIndex];
 
-                        if (searcher(scriptItem, queries[queryIndex])) {
+                        if (searcher($script, queries[queryIndex])) {
                             containerScripts[scriptItemIndex] = defaultContainer.splice(scriptItemIndex, 1)[0];
                         }
                     }
@@ -66,6 +70,8 @@
         }
 
         this._containers[containerName] = containerScripts.filter(function(item) { return !!item; });
+
+        return this;
     };
 
     /**
