@@ -12,6 +12,10 @@
     var DEFAULT_CONTAINER = 'default';
     var instance;
 
+    var notNull = function(item) {
+        return !!item;
+    };
+
     var scriptSearchers = {
         src: function(script, query) {
             return script.hasAttribute('x-src') && $(script).is('[x-src*="' + query + '"]');
@@ -19,6 +23,12 @@
         contains : function(script, query) {
             return !script.hasAttribute('x-src') && $(script).html().indexOf(query) >= 0;
         }
+    };
+
+    var removeItem = function(array, from, to) {
+        var rest = array.slice((to || from) + 1 || array.length);
+        array.length = from < 0 ? array.length + from : from;
+        return array.push.apply(array, rest);
     };
 
     /**
@@ -62,14 +72,15 @@
                         var $script = defaultContainer[scriptItemIndex];
 
                         if (searcher($script, patterns[patternIndex])) {
-                            containerScripts[scriptItemIndex] = defaultContainer.splice(scriptItemIndex, 1)[0];
+                            containerScripts[scriptItemIndex] = $script;
+                            removeItem(defaultContainer, scriptItemIndex);
                         }
                     }
                 }
             }
         }
 
-        this._containers[containerName] = containerScripts.filter(function(item) { return !!item; });
+        this._containers[containerName] = containerScripts.filter(notNull);
 
         return this;
     };
