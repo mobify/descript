@@ -6,7 +6,7 @@ require.config({
         '$': 'lib/zeptojs/dist/zepto',
         'chai': 'node_modules/chai/chai',
         'mocha': 'node_modules/mocha/mocha',
-        'script-manager': 'src/js/script-manager'
+        'descript': 'src/js/descript'
     },
     'shim': {
         'mocha': {

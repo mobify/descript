@@ -1,8 +1,8 @@
 {
-  "name": "script-manager",
+  "name": "descript",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mobify/deckard"
+    "url": "https://github.com/mobify/descript"
   },
   "version": "0.0.1",
   "description": "Utility for managing and prioritizing scripts",

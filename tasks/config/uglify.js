@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         },
         build: {
             files: {
-                'dist/script-manager.min.js': 'dist/script-manager.js'
+                'dist/descript.min.js': 'dist/descript.js'
             }
         }
     };

@@ -16,6 +16,12 @@
         return !!item;
     };
 
+    var toSelectorArray = function(arr) {
+        return $(arr).map(function() {
+            return this;
+        });
+    };
+
     var scriptSearchers = {
         src: function(script, query) {
             return script.hasAttribute('x-src') && $(script).is('[x-src*="' + query + '"]');
@@ -49,21 +55,14 @@
         return instance || (instance = new ScriptManager());
     };
 
-    /**
-     * Adds scripts from the default container into the specified custom container.
-     * Ensures DOM order of scripts is preserved. This method is chainable.
-     * @param containerName
-     * @param scriptPatterns
-     */
-    ScriptManager.prototype.add = function(containerName, scriptPatterns) {
+    ScriptManager.prototype._process = function(scriptAttributes, execute) {
         var defaultContainer = this._containers[DEFAULT_CONTAINER].get();
-        var containerScripts = this._containers[containerName] || [];
 
-        for (var searchType in scriptPatterns) {
-            if (scriptPatterns.hasOwnProperty(searchType)) {
-                var patterns = scriptPatterns[searchType].reverse();
-                var searcher = scriptSearchers[searchType];
-                var patternIndex = patterns.length;
+        for (var attribute in scriptAttributes) {
+            if (scriptAttributes.hasOwnProperty(attribute)) {
+                var attributePatterns = scriptAttributes[attribute].reverse();
+                var searcher = scriptSearchers[attribute];
+                var patternIndex = attributePatterns.length;
 
                 while (patternIndex--) {
                     var scriptItemIndex = defaultContainer.length;
@@ -71,8 +70,8 @@
                     while (scriptItemIndex--) {
                         var $script = defaultContainer[scriptItemIndex];
 
-                        if (searcher($script, patterns[patternIndex])) {
-                            containerScripts[scriptItemIndex] = $script;
+                        if (searcher($script, attributePatterns[patternIndex])) {
+                            execute && execute(scriptItemIndex, $script);
                             removeItem(defaultContainer, scriptItemIndex);
                         }
                     }
@@ -80,14 +79,36 @@
             }
         }
 
-        this._containers[containerName] = containerScripts.filter(notNull);
+        this._containers[DEFAULT_CONTAINER] = toSelectorArray(defaultContainer);
+    };
+
+    /**
+     * Adds scripts from the default container into the specified custom container.
+     * Ensures DOM order of scripts is preserved. This method is chainable.
+     * @param containerName
+     * @param scriptAttributes
+     */
+    ScriptManager.prototype.add = function(containerName, scriptAttributes) {
+        var containerScripts = this._containers[containerName] || [];
+
+        this._process(scriptAttributes, function(scriptItemIndex, $script) {
+            containerScripts[scriptItemIndex] = $script;
+        });
+
+        this._containers[containerName] = toSelectorArray(containerScripts.filter(notNull));
+
+        return this;
+    };
+
+    ScriptManager.prototype.remove = function(scriptAttributes) {
+        this._process(scriptAttributes);
 
         return this;
     };
 
     /**
      * Returns the specific container requested by containerName,
-     * or returns all containers.
+     * or when no parameter is supplied returns all containers as name/value pairs.
      * @param containerName
      * @returns {*}
      */

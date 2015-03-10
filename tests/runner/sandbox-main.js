@@ -2,7 +2,7 @@
 require(['sandbox-config'], function() {
     require([
         '$',
-        'script-manager'
+        'descript'
     ],
     function($, ScriptManager) {
         var dependencies = {};
