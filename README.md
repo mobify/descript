@@ -67,3 +67,5 @@ descript.injectScript('myOverride', 'urgent', {src: ['script4.js']}, function() 
   // do some overrides in here
 );
 ```
+
+This will inject an inline script immediately after the script defined in the script attribute. So, in the above case, the function passed in will be injected immediately following the script that has a `src` attribute containing `script4.js`.
