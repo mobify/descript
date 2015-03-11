@@ -42,20 +42,20 @@
      * all the scripts on the page.
      * @constructor
      */
-    var ScriptManager = function() {
+    var Descript = function() {
         this._containers = {};
         this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]');
     };
 
     /**
      * Singleton function returning an instance of a script manager.
-     * @returns {*|ScriptManager}
+     * @returns {*|Descript}
      */
-    ScriptManager.init = function() {
-        return instance || (instance = new ScriptManager());
+    Descript.init = function() {
+        return instance || (instance = new Descript());
     };
 
-    ScriptManager.prototype._process = function(scriptAttributes, execute) {
+    Descript.prototype._process = function(scriptAttributes, execute) {
         var defaultContainer = this._containers[DEFAULT_CONTAINER].get();
 
         for (var attribute in scriptAttributes) {
@@ -88,7 +88,7 @@
      * @param containerName
      * @param scriptAttributes
      */
-    ScriptManager.prototype.add = function(containerName, scriptAttributes) {
+    Descript.prototype.add = function(containerName, scriptAttributes) {
         var containerScripts = this._containers[containerName] || [];
 
         this._process(scriptAttributes, function(scriptItemIndex, $script) {
@@ -100,7 +100,7 @@
         return this;
     };
 
-    ScriptManager.prototype.remove = function(scriptAttributes) {
+    Descript.prototype.remove = function(scriptAttributes) {
         this._process(scriptAttributes);
 
         return this;
@@ -112,9 +112,9 @@
      * @param containerName
      * @returns {*}
      */
-    ScriptManager.prototype.get = function(containerName) {
+    Descript.prototype.get = function(containerName) {
         return containerName ? this._containers[containerName] : this._containers;
     };
 
-    return ScriptManager;
+    return Descript;
 }));

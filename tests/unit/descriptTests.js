@@ -1,16 +1,16 @@
 define([
     'test-sandbox'
 ], function(testSandbox) {
-    var ScriptManager;
-    var scriptManager;
+    var Descript;
+    var descript;
     var $;
 
-    describe('ScriptManager', function() {
+    describe('Descript', function() {
         beforeEach(function(done) {
             var setUpComplete = function(iFrame$, dependencies) {
                 $ = iFrame$;
-                ScriptManager = dependencies.ScriptManager;
-                scriptManager = ScriptManager.init();
+                Descript = dependencies.Descript;
+                descript = Descript.init();
 
                 done();
             };
@@ -20,17 +20,17 @@ define([
 
         describe('Constructing', function() {
             it('creates instance', function() {
-                expect(scriptManager).to.be.an.instanceOf(ScriptManager);
+                expect(descript).to.be.an.instanceOf(Descript);
             });
 
             it('creates only one instance', function() {
-                var otherScriptManager = ScriptManager.init();
+                var otherDescript = Descript.init();
 
-                expect(scriptManager).to.equal(otherScriptManager);
+                expect(descript).to.equal(otherDescript);
             });
 
             it('pre-processes scripts into script array', function() {
-                var defaultContainer = scriptManager.get('default');
+                var defaultContainer = descript.get('default');
 
                 expect(defaultContainer).to.be.an('array');
                 expect(defaultContainer).to.have.length(17);
@@ -39,23 +39,23 @@ define([
 
         describe('Get', function() {
             it('returns default container', function() {
-                var defaultContainer = scriptManager.get('default');
+                var defaultContainer = descript.get('default');
 
-                expect(defaultContainer).to.equal(scriptManager._containers['default']);
+                expect(defaultContainer).to.equal(descript._containers['default']);
             });
 
             it('returns custom container', function() {
-                scriptManager.add('custom', {
+                descript.add('custom', {
                     src: ['script4']
                 });
-                var customContainer = scriptManager.get('custom');
+                var customContainer = descript.get('custom');
 
                 expect(customContainer).to.be.defined;
                 expect(customContainer).to.have.length(1);
             });
 
             it('segmented scripts return wrapped set', function() {
-                scriptManager
+                descript
                     .add('urgent', {
                         src: ['script4', 'script2']
                     })
@@ -63,9 +63,9 @@ define([
                         src: ['script14', 'script10']
                     });
 
-                var defaultContainer = scriptManager.get('default');
-                var urgentContainer = scriptManager.get('urgent');
-                var delayedContainer = scriptManager.get('delayed');
+                var defaultContainer = descript.get('default');
+                var urgentContainer = descript.get('urgent');
+                var delayedContainer = descript.get('delayed');
 
                 [defaultContainer, urgentContainer, delayedContainer].forEach(function(wrappedSet) {
                     expect(wrappedSet).to.have.property('selector');
@@ -73,7 +73,7 @@ define([
             });
 
             it('returns all containers when no parameter passed', function() {
-                scriptManager
+                descript
                     .add('urgent', {
                         src: ['script4', 'script2']
                     })
@@ -81,7 +81,7 @@ define([
                         src: ['script14', 'script10']
                     });
 
-                var all = scriptManager.get();
+                var all = descript.get();
 
                 expect(all).to.have.property('default');
                 expect(all.default).to.be.an('array');
@@ -96,16 +96,16 @@ define([
 
         describe('Add', function() {
             it('creates custom container with scripts', function() {
-                scriptManager.add('custom', {
+                descript.add('custom', {
                     src: ['script4', 'script2']
                 });
-                var customContainer = scriptManager.get('custom');
+                var customContainer = descript.get('custom');
 
                 expect(customContainer).to.have.length(2);
             });
 
             it('chains calls when adding containers', function() {
-                var scripts = scriptManager
+                var scripts = descript
                     .add('urgent', {
                         src: ['script4', 'script2']
                     })
@@ -118,31 +118,31 @@ define([
             });
 
             it('ensures order of external scripts is maintained', function() {
-                scriptManager.add('custom', {
+                descript.add('custom', {
                     src: ['script4', 'script2']
                 });
-                var customContainer = scriptManager.get('custom');
+                var customContainer = descript.get('custom');
 
                 expect(customContainer[0].attributes[0].value).to.equal('/script2.js');
                 expect(customContainer[1].attributes[0].value).to.equal('/script4.js');
             });
 
             it('ensures order of internal scripts is maintained', function() {
-                scriptManager.add('custom', {
+                descript.add('custom', {
                     contains: ['alert(\'hi\'', 'gtm.start']
                 });
-                var customContainer = scriptManager.get('custom');
+                var customContainer = descript.get('custom');
 
                 expect(customContainer[0].innerHTML).to.contain('gtm.start');
                 expect(customContainer[1].innerHTML).to.contain('alert(\'hi\'');
             });
 
             it('ensures order of internal and external scripts is maintained', function() {
-                scriptManager.add('custom', {
+                descript.add('custom', {
                     src: ['script4', 'script2'],
                     contains: ['alert(\'hi\'', 'gtm.start']
                 });
-                var customContainer = scriptManager.get('custom');
+                var customContainer = descript.get('custom');
 
                 expect(customContainer[0].innerHTML).to.contain('gtm.start');
                 expect(customContainer[1].attributes[0].value).to.equal('/script2.js');
@@ -151,7 +151,7 @@ define([
             });
 
             it('segments scripts into three containers', function() {
-                scriptManager
+                descript
                     .add('urgent', {
                         src: ['script4', 'script2']
                     })
@@ -159,9 +159,9 @@ define([
                         src: ['script14', 'script10']
                     });
 
-                var defaultContainer = scriptManager.get('default');
-                var urgentContainer = scriptManager.get('urgent');
-                var delayedContainer = scriptManager.get('delayed');
+                var defaultContainer = descript.get('default');
+                var urgentContainer = descript.get('urgent');
+                var delayedContainer = descript.get('delayed');
 
                 expect(defaultContainer).to.have.length(13);
                 expect(urgentContainer).to.have.length(2);
@@ -171,28 +171,28 @@ define([
 
         describe('Remove', function() {
             it('correctly removes specific external scripts', function() {
-                scriptManager.remove({ src: ['script6', 'script15'] });
+                descript.remove({ src: ['script6', 'script15'] });
 
-                var defaultContainer = scriptManager.get('default');
+                var defaultContainer = descript.get('default');
 
                 expect(defaultContainer).to.have.length(15);
             });
 
             it('correctly removes specific inline scripts', function() {
-                scriptManager.remove({ contains: ['gtm.start', 'alert(\'hi\''] });
+                descript.remove({ contains: ['gtm.start', 'alert(\'hi\''] });
 
-                var defaultContainer = scriptManager.get('default');
+                var defaultContainer = descript.get('default');
 
                 expect(defaultContainer).to.have.length(15);
             });
 
             it('correctly removes specific external and inline scripts', function() {
-                scriptManager.remove({
+                descript.remove({
                     src: ['script3', 'script11'],
                     contains: ['gtm.start', 'alert(\'hi\'']
                 });
 
-                var defaultContainer = scriptManager.get('default');
+                var defaultContainer = descript.get('default');
 
                 expect(defaultContainer).to.have.length(13);
             });

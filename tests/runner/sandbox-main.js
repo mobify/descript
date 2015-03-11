@@ -4,11 +4,11 @@ require(['sandbox-config'], function() {
         '$',
         'descript'
     ],
-    function($, ScriptManager) {
+    function($, Descript) {
         var dependencies = {};
 
         dependencies.$ = $;
-        dependencies.ScriptManager = ScriptManager;
+        dependencies.Descript = Descript;
 
         window.dependencies = dependencies;
 
