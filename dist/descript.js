@@ -1,4 +1,3 @@
-
 (function(factory) {
     if (typeof define === 'function' && define.amd) {
         define([
@@ -26,7 +25,7 @@
         src: function(script, query) {
             return script.hasAttribute('x-src') && $(script).is('[x-src*="' + query + '"]');
         },
-        contains : function(script, query) {
+        contains: function(script, query) {
             return !script.hasAttribute('x-src') && $(script).html().indexOf(query) >= 0;
         }
     };
@@ -44,8 +43,7 @@
      */
     var Descript = function() {
         this._containers = {};
-        this._injectedScripts = {};
-        this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]');
+        this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]').remove();
     };
 
     /**
@@ -115,7 +113,7 @@
         var getInvoker = function() {
             return $('<script />')
                 .attr('type', 'text/mobify-script')
-                .html('window.descript.invoke(\'' + scriptName + '\');')[0];
+                .html('(' + scriptToInject.toString() + ')();')[0];
         };
 
         while (containerIndex--) {
@@ -125,12 +123,6 @@
                 break;
             }
         }
-
-        this._injectedScripts[scriptName] = scriptToInject;
-    };
-
-    Descript.prototype.invoke = function(key) {
-        this._injectedScripts[key]();
     };
 
     /**
