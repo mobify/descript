@@ -197,5 +197,17 @@ define([
                 expect(defaultContainer).to.have.length(13);
             });
         });
+
+        describe('Inject Script', function() {
+            it('adds inline script at the correct position', function() {
+                descript
+                    .add('custom', {
+                        src: ['script4.js', 'script1.js']
+                    })
+                    .injectScript('tester', 'custom', {src: 'script4'}, function() {
+                        console.log('test function');
+                    });
+            });
+        });
     });
 });

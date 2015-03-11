@@ -44,6 +44,7 @@
      */
     var Descript = function() {
         this._containers = {};
+        this._injectedScripts = {};
         this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]');
     };
 
@@ -104,6 +105,32 @@
         this._process(scriptAttributes);
 
         return this;
+    };
+
+    Descript.prototype.injectScript = function(scriptName, containerName, scriptAttribute, scriptToInject) {
+        var containerScripts = this._containers[containerName].toArray();
+        var attribute = Object.keys(scriptAttribute)[0];
+        var searcher = scriptSearchers[attribute];
+        var containerIndex = containerScripts.length;
+        var getInvoker = function() {
+            return $('<script />')
+                .attr('type', 'text/mobify-script')
+                .html('window.descript.invoke(\'' + scriptName + '\');')[0];
+        };
+
+        while (containerIndex--) {
+            if (searcher(containerScripts[containerIndex], scriptAttribute[attribute])) {
+                containerScripts.splice(containerIndex + 1, 0, getInvoker());
+                this._containers[containerName] = toSelectorArray(containerScripts);
+                break;
+            }
+        }
+
+        this._injectedScripts[scriptName] = scriptToInject;
+    };
+
+    Descript.prototype.invoke = function(key) {
+        this._injectedScripts[key]();
     };
 
     /**
