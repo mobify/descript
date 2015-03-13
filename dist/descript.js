@@ -55,7 +55,7 @@
     };
 
     Descript.prototype._process = function(scriptAttributes, execute) {
-        var defaultContainer = this._containers[DEFAULT_CONTAINER].get();
+        var defaultContainer = this.get(DEFAULT_CONTAINER).toArray();
 
         for (var attribute in scriptAttributes) {
             if (scriptAttributes.hasOwnProperty(attribute)) {
@@ -88,7 +88,7 @@
      * @param scriptAttributes
      */
     Descript.prototype.add = function(containerName, scriptAttributes) {
-        var containerScripts = this._containers[containerName] || [];
+        var containerScripts = this.get(containerName) || [];
 
         this._process(scriptAttributes, function(scriptItemIndex, $script) {
             containerScripts[scriptItemIndex] = $script;
@@ -106,7 +106,7 @@
     };
 
     Descript.prototype.injectScript = function(scriptName, containerName, scriptAttribute, scriptToInject) {
-        var containerScripts = this._containers[containerName].toArray();
+        var containerScripts = this.get(containerName).toArray();
         var attribute = Object.keys(scriptAttribute)[0];
         var searcher = scriptSearchers[attribute];
         var containerIndex = containerScripts.length;
