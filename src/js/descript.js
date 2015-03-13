@@ -42,6 +42,12 @@
      * @constructor
      */
     var Descript = function() {
+        if (Descript.prototype._instance) {
+            return Descript.prototype._instance;
+        }
+
+        Descript.prototype._instance = this;
+
         this._containers = {};
         this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]').remove();
     };
@@ -51,7 +57,7 @@
      * @returns {*|Descript}
      */
     Descript.init = function() {
-        return instance || (instance = new Descript());
+        return Descript.prototype._instance || (Descript.prototype._instance = new Descript());
     };
 
     Descript.prototype._process = function(scriptAttributes, execute) {
