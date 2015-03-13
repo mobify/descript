@@ -9,7 +9,6 @@
     }
 }(function($) {
     var DEFAULT_CONTAINER = 'default';
-    var instance;
 
     var notNull = function(item) {
         return !!item;
@@ -105,12 +104,26 @@
         return this;
     };
 
+    /**
+     * Removes specified scripts from the default container.
+     * @param scriptAttributes
+     * @returns {Descript}
+     */
     Descript.prototype.remove = function(scriptAttributes) {
         this._process(scriptAttributes);
 
         return this;
     };
 
+    /**
+     * Injects a script into the container specified by `containerName`. In terms of position, the
+     * injected script is added directly after the script defined in `scriptAttribute`. The injected
+     * script is added as an inline script.
+     * @param scriptName
+     * @param containerName
+     * @param scriptAttribute
+     * @param scriptToInject
+     */
     Descript.prototype.injectScript = function(scriptName, containerName, scriptAttribute, scriptToInject) {
         var containerScripts = this.get(containerName).toArray();
         var attribute = Object.keys(scriptAttribute)[0];
@@ -139,6 +152,40 @@
      */
     Descript.prototype.get = function(containerName) {
         return containerName ? this._containers[containerName] : this._containers;
+    };
+
+    /**
+     * Replaces string patterns in inline scripts. Patterns can be
+     * @param containerName
+     * @param scriptAttribute
+     * @param pattern
+     * @param replacement
+     */
+    Descript.prototype.replace = function(containerName, scriptAttribute, pattern, replacement) {
+        var containerScripts = this.get(containerName).toArray();
+        var attribute = Object.keys(scriptAttribute)[0];
+        var searcher = scriptSearchers[attribute];
+        var containerIndex = containerScripts.length;
+
+        while (containerIndex--) {
+            var $script = containerScripts[containerIndex];
+
+            if (searcher($script, scriptAttribute[attribute])) {
+                var patterns = [];
+
+                if (arguments.length === 4) {
+                    patterns.push({pattern: pattern, replacement: replacement});
+                } else {
+                    patterns = pattern;
+                }
+
+                for (var i = 0, l = patterns.length; i < l; i++) {
+                    var currentPattern = patterns[i];
+                    $script.html($script.html().replace(currentPattern.pattern, currentPattern.replacement));
+                }
+                break;
+            }
+        }
     };
 
     return Descript;
