@@ -21,11 +21,11 @@
     };
 
     var scriptSearchers = {
-        src: function(script, query) {
-            return script.hasAttribute('x-src') && $(script).is('[x-src*="' + query + '"]');
+        src: function($script, query) {
+            return $script.attr('x-src') && $script.is('[x-src*="' + query + '"]');
         },
-        contains: function(script, query) {
-            return !script.hasAttribute('x-src') && $(script).html().indexOf(query) >= 0;
+        contains: function($script, query) {
+            return !$script.attr('x-src') && $script.html().indexOf(query) >= 0;
         }
     };
 
@@ -69,14 +69,14 @@
                 var patternIndex = attributePatterns.length;
 
                 while (patternIndex--) {
-                    var scriptItemIndex = defaultContainer.length;
+                    var scriptIndex = defaultContainer.length;
 
-                    while (scriptItemIndex--) {
-                        var $script = defaultContainer[scriptItemIndex];
+                    while (scriptIndex--) {
+                        var $script = $(defaultContainer[scriptIndex]);
 
                         if (searcher($script, attributePatterns[patternIndex])) {
-                            execute && execute(scriptItemIndex, $script);
-                            removeItem(defaultContainer, scriptItemIndex);
+                            execute && execute(scriptIndex, $script);
+                            removeItem(defaultContainer, scriptIndex);
                         }
                     }
                 }
@@ -84,6 +84,23 @@
         }
 
         this._containers[DEFAULT_CONTAINER] = toSelectorArray(defaultContainer);
+    };
+
+    Descript.prototype._find = function(containerScripts, scriptAttribute) {
+        var attribute = Object.keys(scriptAttribute)[0];
+        var searcher = scriptSearchers[attribute];
+        var scriptIndex = containerScripts.length;
+
+        while (scriptIndex--) {
+            var $script = $(containerScripts[scriptIndex]);
+
+            if (searcher($script, scriptAttribute[attribute])) {
+                return {
+                    $script: $script,
+                    index: scriptIndex
+                };
+            }
+        }
     };
 
     /**
@@ -96,7 +113,7 @@
         var containerScripts = this.get(containerName) || [];
 
         this._process(scriptAttributes, function(scriptItemIndex, $script) {
-            containerScripts[scriptItemIndex] = $script;
+            containerScripts[scriptItemIndex] = $script[0];
         });
 
         this._containers[containerName] = toSelectorArray(containerScripts.filter(notNull));
@@ -126,21 +143,17 @@
      */
     Descript.prototype.injectScript = function(scriptName, containerName, scriptAttribute, scriptToInject) {
         var containerScripts = this.get(containerName).toArray();
-        var attribute = Object.keys(scriptAttribute)[0];
-        var searcher = scriptSearchers[attribute];
-        var containerIndex = containerScripts.length;
         var getInvoker = function() {
             return $('<script />')
                 .attr('type', 'text/mobify-script')
                 .html('(' + scriptToInject.toString() + ')();')[0];
         };
 
-        while (containerIndex--) {
-            if (searcher(containerScripts[containerIndex], scriptAttribute[attribute])) {
-                containerScripts.splice(containerIndex + 1, 0, getInvoker());
-                this._containers[containerName] = toSelectorArray(containerScripts);
-                break;
-            }
+        var script = this._find(containerScripts, scriptAttribute);
+
+        if (script) {
+            containerScripts.splice(script.index + 1, 0, getInvoker());
+            this._containers[containerName] = toSelectorArray(containerScripts);
         }
     };
 
@@ -163,27 +176,20 @@
      */
     Descript.prototype.replace = function(containerName, scriptAttribute, pattern, replacement) {
         var containerScripts = this.get(containerName).toArray();
-        var attribute = Object.keys(scriptAttribute)[0];
-        var searcher = scriptSearchers[attribute];
-        var containerIndex = containerScripts.length;
+        var script = this._find(containerScripts, scriptAttribute);
 
-        while (containerIndex--) {
-            var $script = containerScripts[containerIndex];
+        if (script) {
+            var patterns = [];
 
-            if (searcher($script, scriptAttribute[attribute])) {
-                var patterns = [];
+            if (arguments.length === 4) {
+                patterns.push({pattern: pattern, replacement: replacement});
+            } else {
+                patterns = pattern;
+            }
 
-                if (arguments.length === 4) {
-                    patterns.push({pattern: pattern, replacement: replacement});
-                } else {
-                    patterns = pattern;
-                }
-
-                for (var i = 0, l = patterns.length; i < l; i++) {
-                    var currentPattern = patterns[i];
-                    $script.html($script.html().replace(currentPattern.pattern, currentPattern.replacement));
-                }
-                break;
+            for (var i = 0, l = patterns.length; i < l; i++) {
+                var currentPattern = patterns[i];
+                script.$script.html(script.$script.html().replace(currentPattern.pattern, currentPattern.replacement));
             }
         }
     };

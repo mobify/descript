@@ -225,7 +225,7 @@ define([
                     });
 
                 // signal completion of our test
-                $(window).on('message', function() {
+                $(window).one('message', function() {
                     done();
                 });
 
@@ -238,6 +238,39 @@ define([
                 }).get().join('');
 
                 $('body').append(scripts);
+            });
+        });
+
+        describe('Replace', function() {
+            it('replaces portion of script with single replacement', function() {
+                descript
+                    .add('custom', {
+                        contains: ['alert(\'hi\'']
+                    })
+                    .replace('custom', { contains: ['alert(\'hi\''] }, 'alert', 'console.log');
+
+                var $script = descript.get('custom').eq(0);
+
+                expect($script.html()).to.contain('console.log');
+            });
+
+            it('replaces portions of script with multiple replacements', function() {
+                descript
+                    .add('custom', {
+                        contains: ['alert(\'hi\'']
+                    })
+                    .replace(
+                        'custom',
+                        { contains: ['alert(\'hi\''] },
+                        [
+                            { pattern: 'alert', replacement: 'console.log' },
+                            { pattern: 'hi', replacement: 'bye' }
+                        ]
+                    );
+
+                var $script = descript.get('custom').eq(0);
+
+                expect($script.html()).to.contain('console.log(\'bye\')');
             });
         });
     });
