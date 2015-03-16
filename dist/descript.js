@@ -9,6 +9,14 @@
     }
 }(function($) {
     var DEFAULT_CONTAINER = 'default';
+    var DEFAULT_SEARCHERS = {
+        src: function($script, query) {
+            return $script.attr('x-src') && $script.is('[x-src*="' + query + '"]');
+        },
+        contains: function($script, query) {
+            return !$script.attr('x-src') && $script.html().indexOf(query) >= 0;
+        }
+    };
 
     var notNull = function(item) {
         return !!item;
@@ -40,14 +48,7 @@
 
         this._containers = {};
         this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]').remove();
-        this.searchers = {
-            src: function($script, query) {
-                return $script.attr('x-src') && $script.is('[x-src*="' + query + '"]');
-            },
-            contains: function($script, query) {
-                return !$script.attr('x-src') && $script.html().indexOf(query) >= 0;
-            }
-        };
+        this.searchers = DEFAULT_SEARCHERS;
     };
 
     /**
@@ -55,7 +56,7 @@
      * @returns {*|Descript}
      */
     Descript.init = function() {
-        return Descript.prototype._instance || (Descript.prototype._instance = new Descript());
+        return Descript.prototype._instance || new Descript();
     };
 
     Descript.prototype._process = function(scriptAttributes, execute) {
