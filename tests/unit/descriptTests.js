@@ -18,7 +18,7 @@ define([
             testSandbox.setUp('sandbox', setUpComplete);
         });
 
-        describe('Constructing', function() {
+        describe('constructing', function() {
             it('creates instance', function() {
                 expect(descript).to.be.an.instanceOf(Descript);
             });
@@ -37,7 +37,7 @@ define([
             });
         });
 
-        describe('Get', function() {
+        describe('get', function() {
             it('returns default container', function() {
                 var defaultContainer = descript.get('default');
 
@@ -94,7 +94,7 @@ define([
             });
         });
 
-        describe('Add', function() {
+        describe('add', function() {
             it('creates custom container with scripts', function() {
                 descript.add('custom', {
                     src: ['script4', 'script2']
@@ -169,7 +169,7 @@ define([
             });
         });
 
-        describe('Remove', function() {
+        describe('remove', function() {
             it('correctly removes specific external scripts', function() {
                 descript.remove({ src: ['script6', 'script15'] });
 
@@ -198,7 +198,7 @@ define([
             });
         });
 
-        describe('Inject Script', function() {
+        describe('injectScript', function() {
             it('adds inline script at the correct position', function() {
                 descript
                     .add('custom', {
@@ -241,7 +241,7 @@ define([
             });
         });
 
-        describe('Replace', function() {
+        describe('replace', function() {
             it('replaces portion of script with single replacement', function() {
                 descript
                     .add('custom', {
@@ -271,6 +271,34 @@ define([
                 var $script = descript.get('custom').eq(0);
 
                 expect($script.html()).to.contain('console.log(\'bye\')');
+            });
+        });
+
+        describe('addSearcher', function() {
+            var searcher;
+
+            beforeEach(function() {
+                searcher = function($script, query) {
+                    var src = $script.attr('x-src');
+
+                    return src && query.constructor === RegExp && query.test(src);
+                };
+                descript.addSearcher('regex', searcher);
+            });
+
+            it('adds a custom searcher', function() {
+                expect(descript.searchers).to.have.property('regex');
+                expect(descript.searchers.regex).to.equal(searcher);
+            });
+
+            it('uses a custom searcher to find scripts', function() {
+                descript.add('patterns', {
+                    regex: [/.*script\d\.js/]
+                });
+
+                var $patternScripts = descript.get('patterns');
+
+                expect($patternScripts).to.have.length(9);
             });
         });
     });

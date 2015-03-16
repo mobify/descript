@@ -20,15 +20,6 @@
         });
     };
 
-    var scriptSearchers = {
-        src: function($script, query) {
-            return $script.attr('x-src') && $script.is('[x-src*="' + query + '"]');
-        },
-        contains: function($script, query) {
-            return !$script.attr('x-src') && $script.html().indexOf(query) >= 0;
-        }
-    };
-
     var removeItem = function(array, from, to) {
         var rest = array.slice((to || from) + 1 || array.length);
         array.length = from < 0 ? array.length + from : from;
@@ -36,7 +27,7 @@
     };
 
     /**
-     * Initializes the script manager with a default container containing
+     * Initializes descript with a default container containing
      * all the scripts on the page.
      * @constructor
      */
@@ -49,10 +40,18 @@
 
         this._containers = {};
         this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]').remove();
+        this.searchers = {
+            src: function($script, query) {
+                return $script.attr('x-src') && $script.is('[x-src*="' + query + '"]');
+            },
+            contains: function($script, query) {
+                return !$script.attr('x-src') && $script.html().indexOf(query) >= 0;
+            }
+        };
     };
 
     /**
-     * Singleton function returning an instance of a script manager.
+     * Initializes descript, ensuring a Singleton instance.
      * @returns {*|Descript}
      */
     Descript.init = function() {
@@ -65,7 +64,7 @@
         for (var attribute in scriptAttributes) {
             if (scriptAttributes.hasOwnProperty(attribute)) {
                 var attributePatterns = scriptAttributes[attribute].reverse();
-                var searcher = scriptSearchers[attribute];
+                var searcher = this.searchers[attribute];
                 var patternIndex = attributePatterns.length;
 
                 while (patternIndex--) {
@@ -88,7 +87,7 @@
 
     Descript.prototype._find = function(containerScripts, scriptAttribute) {
         var attribute = Object.keys(scriptAttribute)[0];
-        var searcher = scriptSearchers[attribute];
+        var searcher = this.searchers[attribute];
         var scriptIndex = containerScripts.length;
 
         while (scriptIndex--) {
@@ -192,6 +191,15 @@
                 script.$script.html(script.$script.html().replace(currentPattern.pattern, currentPattern.replacement));
             }
         }
+    };
+
+    /**
+     * Adds a new script searcher to match scripts in specific ways, such as by regex
+     * @param name
+     * @param searcher
+     */
+    Descript.prototype.addSearcher = function(name, searcher) {
+        this.searchers[name] = searcher;
     };
 
     return Descript;
