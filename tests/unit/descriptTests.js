@@ -197,5 +197,48 @@ define([
                 expect(defaultContainer).to.have.length(13);
             });
         });
+
+        describe('Inject Script', function() {
+            it('adds inline script at the correct position', function() {
+                descript
+                    .add('custom', {
+                        src: ['script4.js', 'script1.js']
+                    })
+                    .injectScript('tester', 'custom', {src: 'script4'}, function() {
+                        console.log('test function');
+                    });
+
+                var $inlineScript = descript.get('custom').eq(2);
+
+                expect($inlineScript.html()).to.contain('test function');
+            });
+
+            it('invokes inline script when appended', function(done) {
+                var scripts;
+                descript
+                    .add('custom', {
+                        src: ['script4.js', 'script1.js', 'script2.js', 'script14.js']
+                    })
+                    .injectScript('tester', 'custom', {src: 'script4'}, function() {
+                        // signal to the test window that we're done
+                        window.parent.postMessage('loaded', '*');
+                    });
+
+                // signal completion of our test
+                $(window).on('message', function() {
+                    done();
+                });
+
+                scripts = descript.get('custom').map(function() {
+                    var script = $(this)[0].outerHTML;
+
+                    return script
+                        .replace('text/mobify-script', 'text/javascript')
+                        .replace(/x-src="([^)]*)"/, 'src="$1"');
+                }).get().join('');
+
+                $('body').append(scripts);
+            });
+        });
     });
 });

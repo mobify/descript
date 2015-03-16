@@ -59,3 +59,13 @@ var $allScripts = descript.get();
 ```
 
 which will return an object of key/value pairs containing the containers, by name, and the wrapped set of scripts for each container.
+
+If you need to inject a script at a specific location within a container, to proxy or override a function for example, you can do this using the `injectScript` function.
+
+```js
+descript.injectScript('myOverride', 'urgent', {src: ['script4.js']}, function() {
+  // do some overrides in here
+);
+```
+
+This will inject an inline script immediately after the script defined in the script attribute. So, in the above case, the function passed in will be injected immediately following the script that has a `src` attribute containing `script4.js`.
