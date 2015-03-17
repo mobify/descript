@@ -59,50 +59,6 @@
         return Descript.prototype._instance || new Descript();
     };
 
-    Descript.prototype._process = function(scriptAttributes, execute) {
-        var defaultContainer = this.get(DEFAULT_CONTAINER).toArray();
-
-        for (var attribute in scriptAttributes) {
-            if (scriptAttributes.hasOwnProperty(attribute)) {
-                var attributePatterns = scriptAttributes[attribute].reverse();
-                var searcher = this.searchers[attribute];
-                var patternIndex = attributePatterns.length;
-
-                while (patternIndex--) {
-                    var scriptIndex = defaultContainer.length;
-
-                    while (scriptIndex--) {
-                        var $script = $(defaultContainer[scriptIndex]);
-
-                        if (searcher($script, attributePatterns[patternIndex])) {
-                            execute && execute(scriptIndex, $script);
-                            removeItem(defaultContainer, scriptIndex);
-                        }
-                    }
-                }
-            }
-        }
-
-        this._containers[DEFAULT_CONTAINER] = toSelectorArray(defaultContainer);
-    };
-
-    Descript.prototype._find = function(containerScripts, scriptAttribute) {
-        var attribute = Object.keys(scriptAttribute)[0];
-        var searcher = this.searchers[attribute];
-        var scriptIndex = containerScripts.length;
-
-        while (scriptIndex--) {
-            var $script = $(containerScripts[scriptIndex]);
-
-            if (searcher($script, scriptAttribute[attribute])) {
-                return {
-                    $script: $script,
-                    index: scriptIndex
-                };
-            }
-        }
-    };
-
     /**
      * Adds scripts from the default container into the specified custom container.
      * Ensures DOM order of scripts is preserved. This method is chainable.
@@ -149,7 +105,7 @@
                 .html('(' + scriptToInject.toString() + ')();')[0];
         };
 
-        var script = this._find(containerScripts, scriptAttribute);
+        var script = this._find(containerName, scriptAttribute);
 
         if (script) {
             containerScripts.splice(script.index + 1, 0, getInvoker());
@@ -176,7 +132,7 @@
      */
     Descript.prototype.replace = function(containerName, scriptAttribute, pattern, replacement) {
         var containerScripts = this.get(containerName).toArray();
-        var script = this._find(containerScripts, scriptAttribute);
+        var script = this._find(containerName, scriptAttribute);
 
         if (script) {
             var patterns = [];
@@ -201,6 +157,64 @@
      */
     Descript.prototype.addSearcher = function(name, searcher) {
         this.searchers[name] = searcher;
+    };
+
+    /**
+     * Processes each script in the container.
+     * @param scriptAttributes
+     * @param execute
+     * @private
+     */
+    Descript.prototype._process = function(scriptAttributes, execute) {
+        var defaultContainer = this.get(DEFAULT_CONTAINER).toArray();
+
+        for (var attribute in scriptAttributes) {
+            if (scriptAttributes.hasOwnProperty(attribute)) {
+                var attributePatterns = scriptAttributes[attribute].reverse();
+                var searcher = this.searchers[attribute];
+                var patternIndex = attributePatterns.length;
+
+                while (patternIndex--) {
+                    var scriptIndex = defaultContainer.length;
+
+                    while (scriptIndex--) {
+                        var $script = $(defaultContainer[scriptIndex]);
+
+                        if (searcher($script, attributePatterns[patternIndex])) {
+                            execute && execute(scriptIndex, $script);
+                            removeItem(defaultContainer, scriptIndex);
+                        }
+                    }
+                }
+            }
+        }
+
+        this._containers[DEFAULT_CONTAINER] = toSelectorArray(defaultContainer);
+    };
+
+    /**
+     * Finds a single script in the container
+     * @param containerName
+     * @param scriptAttribute
+     * @returns {{$script: (*|jQuery|HTMLElement), index: *}}
+     * @private
+     */
+    Descript.prototype._find = function(containerName, scriptAttribute) {
+        var containerScripts = this.get(containerName).toArray();
+        var attribute = Object.keys(scriptAttribute)[0];
+        var searcher = this.searchers[attribute];
+        var scriptIndex = containerScripts.length;
+
+        while (scriptIndex--) {
+            var $script = $(containerScripts[scriptIndex]);
+
+            if (searcher($script, scriptAttribute[attribute])) {
+                return {
+                    $script: $script,
+                    index: scriptIndex
+                };
+            }
+        }
     };
 
     return Descript;
