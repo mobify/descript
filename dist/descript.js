@@ -131,7 +131,6 @@
      * @param replacement
      */
     Descript.prototype.replace = function(containerName, scriptAttribute, pattern, replacement) {
-        var containerScripts = this.get(containerName).toArray();
         var script = this._find(containerName, scriptAttribute);
 
         if (script) {
