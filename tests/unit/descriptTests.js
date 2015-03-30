@@ -204,7 +204,7 @@ define([
                     .add('custom', {
                         src: ['script4.js', 'script1.js']
                     })
-                    .injectScript('tester', 'custom', {src: 'script4'}, function() {
+                    .injectScript({src: 'script4'}, function() {
                         console.log('test function');
                     });
 
@@ -219,7 +219,7 @@ define([
                     .add('custom', {
                         src: ['script4.js', 'script1.js', 'script2.js', 'script14.js']
                     })
-                    .injectScript('tester', 'custom', {src: 'script4'}, function() {
+                    .injectScript({src: 'script4'}, function() {
                         // signal to the test window that we're done
                         window.parent.postMessage('loaded', '*');
                     });
@@ -247,7 +247,7 @@ define([
                     .add('custom', {
                         contains: ['alert(\'hi\'']
                     })
-                    .replace('custom', { contains: ['alert(\'hi\''] }, 'alert', 'console.log');
+                    .replace({ contains: ['alert(\'hi\''] }, 'alert', 'console.log');
 
                 var $script = descript.get('custom').eq(0);
 
@@ -260,7 +260,6 @@ define([
                         contains: ['alert(\'hi\'']
                     })
                     .replace(
-                        'custom',
                         { contains: ['alert(\'hi\''] },
                         [
                             { pattern: 'alert', replacement: 'console.log' },

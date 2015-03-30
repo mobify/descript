@@ -46,8 +46,18 @@
 
         Descript.prototype._instance = this;
 
-        this._containers = {};
-        this._containers[DEFAULT_CONTAINER] = $('script[x-src], script[type="text/mobify-script"]').remove();
+        this._scripts = $('script[x-src], script[type="text/mobify-script"]')
+                            // we remove all the scripts from the DOM so we can manipulate them before adding them back in
+                            .remove()
+                            .map(function(_, script) {
+                                var $script = $(script);
+
+                                return {
+                                    container: DEFAULT_CONTAINER,
+                                    $script: $script
+                                };
+                            })
+                            .get();
         this.searchers = DEFAULT_SEARCHERS;
     };
 
@@ -62,17 +72,13 @@
     /**
      * Adds scripts from the default container into the specified custom container.
      * Ensures DOM order of scripts is preserved. This method is chainable.
-     * @param containerName
+     * @param container
      * @param scriptAttributes
      */
-    Descript.prototype.add = function(containerName, scriptAttributes) {
-        var containerScripts = this.get(containerName) || [];
-
-        this._process(scriptAttributes, function(scriptItemIndex, $script) {
-            containerScripts[scriptItemIndex] = $script[0];
+    Descript.prototype.add = function(container, scriptAttributes) {
+        this._process(scriptAttributes, function(scriptItemIndex, script) {
+            script.container = container;
         });
-
-        this._containers[containerName] = toSelectorArray(containerScripts.filter(notNull));
 
         return this;
     };
@@ -83,60 +89,72 @@
      * @returns {Descript}
      */
     Descript.prototype.remove = function(scriptAttributes) {
-        this._process(scriptAttributes);
+        var scripts = this._scripts;
+
+        this._process(scriptAttributes, function(scriptItemIndex) {
+            removeItem(scripts, scriptItemIndex);
+        });
 
         return this;
     };
 
     /**
-     * Injects a script into the container specified by `containerName`. In terms of position, the
+     * Injects a script into the container specified by `container`. In terms of position, the
      * injected script is added directly after the script defined in `scriptAttribute`. The injected
      * script is added as an inline script.
-     * @param scriptName
-     * @param containerName
      * @param scriptAttribute
      * @param scriptToInject
      */
-    Descript.prototype.injectScript = function(scriptName, containerName, scriptAttribute, scriptToInject) {
-        var containerScripts = this.get(containerName).toArray();
+    Descript.prototype.injectScript = function(scriptAttribute, scriptToInject) {
         var getInvoker = function() {
             return $('<script />')
                 .attr('type', 'text/mobify-script')
                 .html('(' + scriptToInject.toString() + ')();')[0];
         };
 
-        var script = this._find(containerName, scriptAttribute);
+        var script = this._find(scriptAttribute);
 
         if (script) {
-            containerScripts.splice(script.index + 1, 0, getInvoker());
-            this._containers[containerName] = toSelectorArray(containerScripts);
+            this._scripts.splice(script.index + 1, 0, {container: script.script.container, $script: getInvoker()});
         }
     };
 
     /**
-     * Returns the specific container requested by containerName,
+     * Returns the specific container requested by container,
      * or when no parameter is supplied returns all containers as name/value pairs.
-     * @param containerName
+     * @param container
      * @returns {*}
      */
-    Descript.prototype.get = function(containerName) {
-        return containerName ? this._containers[containerName] : this._containers;
+    Descript.prototype.get = function(container) {
+        var self = this;
+
+        if (!this._containers) {
+            this._containers = {};
+
+            this._scripts.map(function(script) {
+                var currentContainer = script.container;
+                var $scripts = self._containers[currentContainer] || $();
+
+                self._containers[currentContainer] = $scripts.add(script.$script);
+            });
+        }
+
+        return container ? this._containers[container] : this._containers;
     };
 
     /**
-     * Replaces string patterns in inline scripts. Patterns can be
-     * @param containerName
+     * Replaces string patterns in inline scripts.
      * @param scriptAttribute
      * @param pattern
      * @param replacement
      */
-    Descript.prototype.replace = function(containerName, scriptAttribute, pattern, replacement) {
-        var script = this._find(containerName, scriptAttribute);
+    Descript.prototype.replace = function(scriptAttribute, pattern, replacement) {
+        var script = this._find(scriptAttribute).script;
 
         if (script) {
             var patterns = [];
 
-            if (arguments.length === 4) {
+            if (arguments.length === 3) {
                 patterns.push({pattern: pattern, replacement: replacement});
             } else {
                 patterns = pattern;
@@ -165,7 +183,7 @@
      * @private
      */
     Descript.prototype._process = function(scriptAttributes, execute) {
-        var defaultContainer = this.get(DEFAULT_CONTAINER).toArray();
+        var scripts = this._scripts;
 
         for (var attribute in scriptAttributes) {
             if (scriptAttributes.hasOwnProperty(attribute)) {
@@ -174,42 +192,38 @@
                 var patternIndex = attributePatterns.length;
 
                 while (patternIndex--) {
-                    var scriptIndex = defaultContainer.length;
+                    var scriptIndex = scripts.length;
 
                     while (scriptIndex--) {
-                        var $script = $(defaultContainer[scriptIndex]);
+                        var script = scripts[scriptIndex];
 
-                        if (searcher($script, attributePatterns[patternIndex])) {
-                            execute && execute(scriptIndex, $script);
-                            removeItem(defaultContainer, scriptIndex);
+                        if (searcher($(script.$script), attributePatterns[patternIndex])) {
+                            execute && execute(scriptIndex, script);
                         }
                     }
                 }
             }
         }
-
-        this._containers[DEFAULT_CONTAINER] = toSelectorArray(defaultContainer);
     };
 
     /**
-     * Finds a single script in the container
-     * @param containerName
+     * Searches scripts to find a single script based on the supplied scriptAttribute
      * @param scriptAttribute
      * @returns {{$script: (*|jQuery|HTMLElement), index: *}}
      * @private
      */
-    Descript.prototype._find = function(containerName, scriptAttribute) {
-        var containerScripts = this.get(containerName).toArray();
+    Descript.prototype._find = function(scriptAttribute) {
+        var scripts = this._scripts;
         var attribute = Object.keys(scriptAttribute)[0];
         var searcher = this.searchers[attribute];
-        var scriptIndex = containerScripts.length;
+        var scriptIndex = scripts.length;
 
         while (scriptIndex--) {
-            var $script = $(containerScripts[scriptIndex]);
+            var script = scripts[scriptIndex];
 
-            if (searcher($script, scriptAttribute[attribute])) {
+            if (searcher($(script.$script), scriptAttribute[attribute])) {
                 return {
-                    $script: $script,
+                    script: script,
                     index: scriptIndex
                 };
             }
