@@ -18,16 +18,6 @@
         }
     };
 
-    var notNull = function(item) {
-        return !!item;
-    };
-
-    var toSelectorArray = function(arr) {
-        return $(arr).map(function() {
-            return this;
-        });
-    };
-
     var removeItem = function(array, from, to) {
         var rest = array.slice((to || from) + 1 || array.length);
         array.length = from < 0 ? array.length + from : from;
@@ -76,7 +66,7 @@
      * @param scriptAttributes
      */
     Descript.prototype.add = function(container, scriptAttributes) {
-        this._process(scriptAttributes, function(scriptItemIndex, script) {
+        this._each(scriptAttributes, function(scriptItemIndex, script) {
             script.container = container;
         });
 
@@ -91,7 +81,7 @@
     Descript.prototype.remove = function(scriptAttributes) {
         var scripts = this._scripts;
 
-        this._process(scriptAttributes, function(scriptItemIndex) {
+        this._each(scriptAttributes, function(scriptItemIndex) {
             removeItem(scripts, scriptItemIndex);
         });
 
@@ -115,7 +105,7 @@
         var script = this._find(scriptAttribute);
 
         if (script) {
-            this._scripts.splice(script.index + 1, 0, {container: script.container, $script: getInvoker()});
+            this._scripts.splice(script.index + 1, 0, {container: script.script.container, $script: getInvoker()});
         }
     };
 
@@ -154,7 +144,7 @@
         if (script) {
             var patterns = [];
 
-            if (arguments.length === 4) {
+            if (arguments.length === 3) {
                 patterns.push({pattern: pattern, replacement: replacement});
             } else {
                 patterns = pattern;
@@ -182,7 +172,7 @@
      * @param execute
      * @private
      */
-    Descript.prototype._process = function(scriptAttributes, execute) {
+    Descript.prototype._each = function(scriptAttributes, execute) {
         var scripts = this._scripts;
 
         for (var attribute in scriptAttributes) {
@@ -198,7 +188,7 @@
                         var script = scripts[scriptIndex];
 
                         if (searcher($(script.$script), attributePatterns[patternIndex])) {
-                            execute && execute(scriptIndex, script);
+                            execute(scriptIndex, script);
                         }
                     }
                 }
