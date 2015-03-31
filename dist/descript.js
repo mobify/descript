@@ -63,10 +63,10 @@
      * Adds scripts from the default container into the specified custom container.
      * Ensures DOM order of scripts is preserved. This method is chainable.
      * @param container
-     * @param scriptAttributes
+     * @param searchTypes
      */
-    Descript.prototype.add = function(container, scriptAttributes) {
-        this._each(scriptAttributes, function(scriptItemIndex, script) {
+    Descript.prototype.add = function(container, searchTypes) {
+        this._each(searchTypes, function(scriptItemIndex, script) {
             script.container = container;
         });
 
@@ -75,13 +75,13 @@
 
     /**
      * Removes specified scripts from the default container.
-     * @param scriptAttributes
+     * @param searchTypes
      * @returns {Descript}
      */
-    Descript.prototype.remove = function(scriptAttributes) {
+    Descript.prototype.remove = function(searchTypes) {
         var scripts = this._scripts;
 
-        this._each(scriptAttributes, function(scriptItemIndex) {
+        this._each(searchTypes, function(scriptItemIndex) {
             removeItem(scripts, scriptItemIndex);
         });
 
@@ -90,22 +90,21 @@
 
     /**
      * Injects a script into the container specified by `container`. In terms of position, the
-     * injected script is added directly after the script defined in `scriptAttribute`. The injected
+     * injected script is added directly after the script defined in `searchType`. The injected
      * script is added as an inline script.
-     * @param scriptAttribute
+     * @param searchType
      * @param scriptToInject
      */
-    Descript.prototype.injectScript = function(scriptAttribute, scriptToInject) {
-        var getInvoker = function() {
-            return $('<script />')
-                .attr('type', 'text/mobify-script')
-                .html('(' + scriptToInject.toString() + ')();')[0];
-        };
-
-        var script = this._find(scriptAttribute);
+    Descript.prototype.injectScript = function(searchType, scriptToInject) {
+        var script = this._find(searchType);
 
         if (script) {
-            this._scripts.splice(script.index + 1, 0, {container: script.script.container, $script: getInvoker()});
+            this._scripts.splice(script.index + 1, 0, {
+                container: script.script.container,
+                $script: $('<script />')
+                    .attr('type', 'text/mobify-script')
+                    .html('(' + scriptToInject.toString() + ')();')[0]
+            });
         }
     };
 
@@ -134,12 +133,12 @@
 
     /**
      * Replaces string patterns in inline scripts.
-     * @param scriptAttribute
+     * @param searchType
      * @param pattern
      * @param replacement
      */
-    Descript.prototype.replace = function(scriptAttribute, pattern, replacement) {
-        var script = this._find(scriptAttribute).script;
+    Descript.prototype.replace = function(searchType, pattern, replacement) {
+        var script = this._find(searchType).script;
 
         if (script) {
             var patterns = [];
@@ -168,16 +167,16 @@
 
     /**
      * Processes each script in the container.
-     * @param scriptAttributes
+     * @param searchTypes
      * @param execute
      * @private
      */
-    Descript.prototype._each = function(scriptAttributes, execute) {
+    Descript.prototype._each = function(searchTypes, execute) {
         var scripts = this._scripts;
 
-        for (var attribute in scriptAttributes) {
-            if (scriptAttributes.hasOwnProperty(attribute)) {
-                var attributePatterns = scriptAttributes[attribute].reverse();
+        for (var attribute in searchTypes) {
+            if (searchTypes.hasOwnProperty(attribute)) {
+                var attributePatterns = searchTypes[attribute].reverse();
                 var searcher = this.searchers[attribute];
                 var patternIndex = attributePatterns.length;
 
@@ -197,21 +196,21 @@
     };
 
     /**
-     * Searches scripts to find a single script based on the supplied scriptAttribute
-     * @param scriptAttribute
+     * Searches scripts to find a single script based on the supplied searchType
+     * @param searchType
      * @returns {{$script: (*|jQuery|HTMLElement), index: *}}
      * @private
      */
-    Descript.prototype._find = function(scriptAttribute) {
+    Descript.prototype._find = function(searchType) {
         var scripts = this._scripts;
-        var attribute = Object.keys(scriptAttribute)[0];
+        var attribute = Object.keys(searchType)[0];
         var searcher = this.searchers[attribute];
         var scriptIndex = scripts.length;
 
         while (scriptIndex--) {
             var script = scripts[scriptIndex];
 
-            if (searcher($(script.$script), scriptAttribute[attribute])) {
+            if (searcher($(script.$script), searchType[attribute])) {
                 return {
                     script: script,
                     index: scriptIndex
