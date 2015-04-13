@@ -4,16 +4,16 @@ Manage desktop scripts in a simple way in Adaptive.js
 
 [![Circle CI](https://circleci.com/gh/mobify/descript.svg?style=shield&circle-token=ef84781d06c021badc882f227815b8e790de3dcb)](https://circleci.com/gh/mobify/descript)
 
-Descript allows you to manage scripts captured from desktop from within your Adaptive.js views. It provides some simple features:
+**Descript** allows you to manage scripts captured from the desktop site's HTML from within your Adaptive.js views. It provides some simple features, such as:
 
-1. Loading all desktop scripts into a default container, preserving source order
-2. Allowing the developer to create containers of scripts for different use cases (i.e. urgent scripts that need to be executed in the document head)
-3. Allowing for unneeded scripts to be removed
-4. Adding the ability to inject a script to execute at a specific location within a script container
+1. loading all desktop scripts into a default container, preserving source order
+2. allowing the developer to create containers of scripts for different use cases (i.e. urgent scripts that need to be executed in the document head)
+3. allowing for unneeded scripts to be removed
+4. adding the ability to inject a script to execute at a specific location within a script container.
 
 ## Quickstart
 
-Install descript using bower:
+Install `descript` using bower:
 
 ```cli
 bower install descript --save
@@ -25,7 +25,7 @@ Initialize it in your view:
 descript.init();
 ```
 
-The init method creates a singleton instance, so subsequent calls will simply return the same instance. This is particularly useful if you need to manipulate scripts in a specific view in addition to the base view.
+The `init` method creates a singleton instance, so subsequent calls will simply return the same instance. This is particularly useful if you need to manipulate scripts in a specific view in addition to the base view.
 
 After initializing you can then use descript to add scripts to different containers, using patterns that match either `src` attributes (or `x-src` in the case of a captured document) for external scripts, or string patterns for inline scripts:
 
@@ -48,7 +48,7 @@ descript.remove({
 });
 ```
 
-To get scripts within a specific container, use the `get` function:
+To get scripts within a specific container, use the `get` function, which returns a wrapped set of scripts:
 
 ```js
 var $urgentScripts = descript.get('urgent');
@@ -65,7 +65,7 @@ which will return an object of key/value pairs containing the containers, by nam
 If you need to inject a script at a specific location, to proxy or override a function for example, you can do this using the `injectScript` function.
 
 ```js
-descript.injectScript({src: ['script4.js']}, function() {
+descript.injectScript({src: 'script4.js'}, function() {
   // do some overrides in here
 );
 ```
