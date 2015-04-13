@@ -6,6 +6,12 @@ define([
     var $;
 
     describe('Descript', function() {
+        var MULTIPLE_SEARCH_TYPES_ERROR = 'The searchType parameter should contain only one type, i.e. { src: \'script1\' }';
+        var MULTIPLE_SEARCH_PATTERNS_ERROR = 'The searchType value should be a string or an array with only a single item, i.e. { src: \'script1\' } or { contains: [\'script1\'] }';
+        var contains = {
+            alertPattern: 'alert(\'hi\''
+        };
+        
         beforeEach(function(done) {
             var setUpComplete = function(iFrame$, dependencies) {
                 $ = iFrame$;
@@ -71,8 +77,10 @@ define([
                     expect(wrappedSet).to.have.property('selector');
                 });
             });
+        });
 
-            it('returns all containers when no parameter passed', function() {
+        describe('getAll', function() {
+            it('returns all containers', function() {
                 descript
                     .add('urgent', {
                         src: ['script4', 'script2']
@@ -81,7 +89,7 @@ define([
                         src: ['script14', 'script10']
                     });
 
-                var all = descript.get();
+                var all = descript.getAll();
 
                 expect(all).to.have.property('default');
                 expect(all.default).to.be.an('array');
@@ -95,13 +103,39 @@ define([
         });
 
         describe('add', function() {
-            it('creates custom container with scripts', function() {
+            it('throws when no container parameter is supplied', function() {
+                descript.add('custom', {
+                    src: ['script4', 'script2']
+                });
+
+                expect(descript.get).to.throw;
+            });
+
+            it('creates custom container with scripts using src search type', function() {
                 descript.add('custom', {
                     src: ['script4', 'script2']
                 });
                 var customContainer = descript.get('custom');
 
                 expect(customContainer).to.have.length(2);
+            });
+
+            it('creates custom container with scripts using contains search type', function() {
+                descript.add('custom', {
+                    contains: [contains.alertPattern]
+                });
+                var customContainer = descript.get('custom');
+
+                expect(customContainer).to.have.length(1);
+            });
+
+            it('creates custom container with scripts using regex search type', function() {
+                descript.add('custom', {
+                    regex: [/.*script\d\.js/]
+                });
+                var customContainer = descript.get('custom');
+
+                expect(customContainer).to.have.length(9);
             });
 
             it('chains calls when adding containers', function() {
@@ -112,7 +146,7 @@ define([
                     .add('delayed', {
                         src: ['script14', 'script10']
                     })
-                    .get();
+                    .getAll();
 
                 expect(Object.keys(scripts)).to.have.length(3);
             });
@@ -129,25 +163,25 @@ define([
 
             it('ensures order of internal scripts is maintained', function() {
                 descript.add('custom', {
-                    contains: ['alert(\'hi\'', 'gtm.start']
+                    contains: [contains.alertPattern, 'gtm.start']
                 });
                 var customContainer = descript.get('custom');
 
                 expect(customContainer[0].innerHTML).to.contain('gtm.start');
-                expect(customContainer[1].innerHTML).to.contain('alert(\'hi\'');
+                expect(customContainer[1].innerHTML).to.contain(contains.alertPattern);
             });
 
             it('ensures order of internal and external scripts is maintained', function() {
                 descript.add('custom', {
                     src: ['script4', 'script2'],
-                    contains: ['alert(\'hi\'', 'gtm.start']
+                    contains: [contains.alertPattern, 'gtm.start']
                 });
                 var customContainer = descript.get('custom');
 
                 expect(customContainer[0].innerHTML).to.contain('gtm.start');
                 expect(customContainer[1].attributes[0].value).to.equal('/script2.js');
                 expect(customContainer[2].attributes[0].value).to.equal('/script4.js');
-                expect(customContainer[3].innerHTML).to.contain('alert(\'hi\'');
+                expect(customContainer[3].innerHTML).to.contain(contains.alertPattern);
             });
 
             it('segments scripts into three containers', function() {
@@ -167,6 +201,28 @@ define([
                 expect(urgentContainer).to.have.length(2);
                 expect(delayedContainer).to.have.length(2);
             });
+
+            it('accepts single string as searchType arguments', function() {
+                descript
+                    .add('urgent', {
+                        src: 'script4'
+                    });
+
+                var urgentContainer = descript.get('urgent');
+
+                expect(urgentContainer).to.have.length(1);
+            });
+
+            it('accepts string with comma separated patterns as searchType arguments', function() {
+                descript
+                    .add('urgent', {
+                        src: 'script4, script1.js'
+                    });
+
+                var urgentContainer = descript.get('urgent');
+
+                expect(urgentContainer).to.have.length(2);
+            });
         });
 
         describe('remove', function() {
@@ -179,7 +235,7 @@ define([
             });
 
             it('correctly removes specific inline scripts', function() {
-                descript.remove({ contains: ['gtm.start', 'alert(\'hi\''] });
+                descript.remove({ contains: ['gtm.start', contains.alertPattern] });
 
                 var defaultContainer = descript.get('default');
 
@@ -189,7 +245,7 @@ define([
             it('correctly removes specific external and inline scripts', function() {
                 descript.remove({
                     src: ['script3', 'script11'],
-                    contains: ['gtm.start', 'alert(\'hi\'']
+                    contains: ['gtm.start', contains.alertPattern]
                 });
 
                 var defaultContainer = descript.get('default');
@@ -239,15 +295,40 @@ define([
 
                 $('body').append(scripts);
             });
+
+            it('throws when searchType contains multiple types', function() {
+                descript
+                    .add('custom', {
+                        contains: [contains.alertPattern]
+                    });
+
+                expect(function() {
+                    descript.injectScript({
+                        src: ['script1'],
+                        contains: [contains.alertPattern]
+                    }, 'alert', 'console.log');
+                }).to.throw(MULTIPLE_SEARCH_TYPES_ERROR);
+            });
+
+            it('throws when searchType is an array with multiple search patterns', function() {
+                descript
+                    .add('custom', {
+                        contains: [contains.alertPattern]
+                    });
+
+                expect(function() {
+                    descript.injectScript({ contains: [contains.alertPattern, 'console'] }, 'alert', 'console.log');
+                }).to.throw(MULTIPLE_SEARCH_PATTERNS_ERROR);
+            });
         });
 
         describe('replace', function() {
             it('replaces portion of script with single replacement', function() {
                 descript
                     .add('custom', {
-                        contains: ['alert(\'hi\'']
+                        contains: [contains.alertPattern]
                     })
-                    .replace({ contains: ['alert(\'hi\''] }, 'alert', 'console.log');
+                    .replace({ contains: [contains.alertPattern] }, 'alert', 'console.log');
 
                 var $script = descript.get('custom').eq(0);
 
@@ -257,10 +338,10 @@ define([
             it('replaces portions of script with multiple replacements', function() {
                 descript
                     .add('custom', {
-                        contains: ['alert(\'hi\'']
+                        contains: [contains.alertPattern]
                     })
                     .replace(
-                        { contains: ['alert(\'hi\''] },
+                        { contains: [contains.alertPattern] },
                         [
                             { pattern: 'alert', replacement: 'console.log' },
                             { pattern: 'hi', replacement: 'bye' }
@@ -271,6 +352,31 @@ define([
 
                 expect($script.html()).to.contain('console.log(\'bye\')');
             });
+
+            it('throws when searchType contains multiple types', function() {
+                descript
+                    .add('custom', {
+                        contains: [contains.alertPattern]
+                    });
+
+                expect(function() {
+                    descript.replace({
+                        src: ['script1'],
+                        contains: [contains.alertPattern]
+                    }, 'alert', 'console.log');
+                }).to.throw(MULTIPLE_SEARCH_TYPES_ERROR);
+            });
+
+            it('throws when searchType is an array with multiple search patterns', function() {
+                descript
+                    .add('custom', {
+                        contains: [contains.alertPattern]
+                    });
+
+                expect(function() {
+                    descript.replace({ contains: [contains.alertPattern, 'console'] }, 'alert', 'console.log');
+                }).to.throw(MULTIPLE_SEARCH_PATTERNS_ERROR);
+            });
         });
 
         describe('addSearcher', function() {
@@ -278,26 +384,24 @@ define([
 
             beforeEach(function() {
                 searcher = function($script, query) {
-                    var src = $script.attr('x-src');
-
-                    return src && query.constructor === RegExp && query.test(src);
+                    return $script.attr('data-script') === query;
                 };
-                descript.addSearcher('regex', searcher);
+                descript.addSearcher('dataScript', searcher);
             });
 
             it('adds a custom searcher', function() {
-                expect(descript.searchers).to.have.property('regex');
-                expect(descript.searchers.regex).to.equal(searcher);
+                expect(descript.searchers).to.have.property('dataScript');
+                expect(descript.searchers.dataScript).to.equal(searcher);
             });
 
             it('uses a custom searcher to find scripts', function() {
                 descript.add('patterns', {
-                    regex: [/.*script\d\.js/]
+                    dataScript: ['custom']
                 });
 
                 var $patternScripts = descript.get('patterns');
 
-                expect($patternScripts).to.have.length(9);
+                expect($patternScripts).to.have.length(1);
             });
         });
     });
