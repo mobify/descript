@@ -104,11 +104,79 @@ There are a few different ways to search for scripts.
 
 Specifying the `src` search type will search the script element's `x-src` attribute to see whether it **contains** the search pattern.
 
+```js
+descript
+  .add('urgent', {
+    src: ['script1.js', 'script2.js']  
+  });
+```
+
 ### `regex`
 
 If you need more control over the pattern you're searching for, use the regex search type. This search type will also search `x-src` attributes, but will allow for more specific search patterns. 
+
+
+```js
+descript
+  .add('urgent', {
+    regex: [/.*script1\d\.js/]
+  });
+```
 
 ### `contains`
 
 Use the `contains` search type if searching for content in an inline script. 
 
+
+```js
+descript
+  .add('urgent', {
+    contains: 'somescript.init'  
+  });
+```
+
+## Using descript in your dust template
+
+Once you've added, removed, and injected to your heart's content, you will want to output the manipulated scripts in your dust template. To do so, you'll want to retreive all the script containers and attach them to your context.
+
+```js
+
+var descript;
+
+return {
+	template: template,
+	includes: {
+		header: header,
+		footer: footer
+	},
+	preProcess: function() {
+		descript = Descript.init();
+		
+		descript
+			.add('seusses', {
+				src: ['one-script', 'two-script'],
+				contains: ['red script', 'blue script']
+			})
+			.remove({ src: 'this-script, that-script' });
+	},
+	context: {
+		scripts: descript.getAll(), // attach to context property
+		...
+	}
+};
+```
+
+And ultimately use in your dust template:
+
+```html
+{scripts.seusses}
+...
+{scripts.default}
+```
+
+
+### Grunt Tasks
+
+* `grunt` or `grunt build` - builds a distributable release
+* `grunt test` - runs the test suite
+* `grunt test:browser` - runs a server that allows you to run the test suite in your browser
