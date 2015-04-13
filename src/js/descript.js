@@ -14,7 +14,7 @@
             return $script.attr('x-src') && $script.is('[x-src*="' + query + '"]');
         },
         contains: function($script, query) {
-            return !$script.attr('x-src') && $script.html().indexOf(query) >= 0;
+            return !$script.attr('x-src') && $script.text().indexOf(query) >= 0;
         },
         regex: function($script, query) {
             var src = $script.attr('x-src');
@@ -72,7 +72,13 @@
     Descript.prototype.get = function(container) {
         if (!container) { throw new Error('You must specify a script container'); }
 
-        return this.getAll()[container];
+        var $scripts = this.getAll()[container];
+
+        if (!$scripts) {
+            throw new Error('The ' + container + ' script container is empty');
+        }
+
+        return $scripts;
     };
 
     /**
@@ -166,7 +172,7 @@
 
             for (var i = 0, l = patterns.length; i < l; i++) {
                 var currentPattern = patterns[i];
-                script.$script.html(script.$script.html().replace(currentPattern.pattern, currentPattern.replacement));
+                script.$script.text(script.$script.text().replace(currentPattern.pattern, currentPattern.replacement));
             }
         }
     };

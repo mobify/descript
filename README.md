@@ -55,7 +55,7 @@ var $urgentScripts = descript.get('urgent');
 or you can get all the scripts:
 
 ```js
-var $allScripts = descript.get();
+var $allScripts = descript.getAll();
 ```
 
 which will return an object of key/value pairs containing the containers, by name, and the wrapped set of scripts for each container.
@@ -69,3 +69,44 @@ descript.injectScript({src: ['script4.js']}, function() {
 ```
 
 This will inject an inline script immediately after the script defined in the script attribute. So, in the above case, the function passed in will be injected immediately following the script that has a `src` attribute containing `script4.js`.
+
+## Search Type Structure
+
+Search types are supplied via an **object**, where the key is the **search type** and the value is the **pattern**. 
+
+In the example below, we're using the `src` search type, and the pattern is `jquery.ui`.
+
+```js
+{ src: 'jquery.ui' }
+```
+
+This will match the following:
+
+```html
+<script type="text/javascript" x-src="/assets/js/jquery-ui-1.11.4.js"></script>
+```
+
+Patterns can be either:
+
+1. A single string pattern, i.e. 'script1'
+2. A string of comma separated patterns, i.e. 'script1, script2'
+3. An array of patterns, i.e. ['script1', 'script2']
+
+Internally descript will **normalize** these values into an array of patterns.
+
+## Search Types
+
+There are a few different ways to search for scripts. 
+
+### `src`
+
+Specifying the `src` search type will search the script element's `x-src` attribute to see whether it **contains** the search pattern.
+
+### `regex`
+
+If you need more control over the pattern you're searching for, use the regex search type. This search type will also search `x-src` attributes, but will allow for more specific search patterns. 
+
+### `contains`
+
+Use the `contains` search type if searching for content in an inline script. 
+
