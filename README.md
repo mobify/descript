@@ -38,7 +38,7 @@ descript
   });
 ```
 
-Or, you can remove scripts entirely from the default container:
+Or, you can remove scripts entirely:
 
 ```js
 descript.remove({
