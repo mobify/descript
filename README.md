@@ -19,19 +19,21 @@ Install descript using bower:
 bower install descript --save
 ```
 
-Initialize it in your base view:
+Initialize it in your view:
 
 ```js
 descript.init();
 ```
 
-Then use it to add scripts to different containers, using patterns that match either `src` attributes for external scripts, or string patterns for inline scripts:
+The init method creates a singleton instance, so subsequent calls will simply return the same instance. This is particularly useful if you need to manipulate scripts in a specific view in addition to the base view.
+
+After initializing you can then use descript to add scripts to different containers, using patterns that match either `src` attributes (or `x-src` in the case of a captured document) for external scripts, or string patterns for inline scripts:
 
 ```js
 descript
   .add('urgent', {
     src: ['script1.js', 'script2.js'],
-    contains: ['somescript.init']
+    contains: 'somescript.init'
   })
   .add('defer', {
     src: ['script4.js']
