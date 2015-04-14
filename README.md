@@ -25,6 +25,17 @@ Initialize it in your view:
 descript.init();
 ```
 
+If you need to preserve scripts in the DOM in a certain position (i.e. you want descript to leave your scripts alone), you can specify a `preserve` option when initializing:
+
+```js
+descript.init({
+	preserve: {
+		src: 'leaveThisScript.js',
+		contains: ['leave', 'these', 'too']
+	}
+});
+```
+
 The `init` method creates a singleton instance, so subsequent calls will simply return the same instance. This is particularly useful if you need to manipulate scripts in a specific view in addition to the base view.
 
 After initializing you can then use descript to add scripts to different containers, using patterns that match either `src` attributes (or `x-src` in the case of a captured document) for external scripts, or string patterns for inline scripts:
@@ -62,10 +73,18 @@ var $allScripts = descript.getAll();
 
 which will return an object of key/value pairs containing the containers, by name, and the wrapped set of scripts for each container.
 
-If you need to inject a script at a specific location, to proxy or override a function for example, you can do this using the `injectScript` function.
+If you need to insert a script at a specific location, to proxy or override a function for example, you can do this using the `insertScript` function. The second parameter to `insertScript` can be either a `string` representing the `src` attribute of an external script, or a `function` representing the contents of an inline script.
 
 ```js
-descript.injectScript({src: 'script4.js'}, function() {
+// inserts an external script
+descript.insertScript({src: 'script4.js'}, 'someExternal.js');
+```
+
+or
+
+```js
+// inserts an inline script
+descript.insertScript({src: 'script4.js'}, function() {
   // do some overrides in here
 );
 ```
