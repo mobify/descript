@@ -195,7 +195,7 @@ And ultimately use in your dust template:
 
 ## Methods
 
-### add
+### `add`
 
 Adds a script to a custom container.
 
@@ -215,7 +215,7 @@ descript
   });
 ```
 
-### remove
+### `remove`
 
 Removes a script from the default container.
 
@@ -227,7 +227,7 @@ Removes a script from the default container.
 descript.remove({ src: 'jquery' });
 ```
 
-### insertScript
+### `insertScript`
 
 Inserts a script after the script specified by `searchType`
 
@@ -250,7 +250,7 @@ descript.insertScript({src: 'script4.js'}, function() {
 );
 ```
 
-### replace
+### `replace`
 
 Replaces the contents of an inline script specified by `searchType`
 
