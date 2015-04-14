@@ -156,7 +156,7 @@ descript
 
 ## Using descript in your dust template
 
-Once you've added, removed, and injected to your heart's content, you will want to output the manipulated scripts in your dust template. To do so, you'll want to retreive all the script containers and attach them to your context.
+Once you've added, removed, and inserted to your heart's content, you will want to output the manipulated scripts in your dust template. To do so, you'll want to retreive all the script containers and attach them to your context.
 
 ```js
 
