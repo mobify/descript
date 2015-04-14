@@ -11,7 +11,7 @@ define([
         var contains = {
             alertPattern: 'alert(\'hi\''
         };
-        
+
         beforeEach(function(done) {
             var setUpComplete = function(iFrame$, dependencies) {
                 $ = iFrame$;
@@ -254,13 +254,13 @@ define([
             });
         });
 
-        describe('injectScript', function() {
+        describe('insertScript', function() {
             it('adds inline script at the correct position', function() {
                 descript
                     .add('custom', {
                         src: ['script4.js', 'script1.js']
                     })
-                    .injectScript({src: 'script4'}, function() {
+                    .insertScript({src: 'script4'}, function() {
                         console.log('test function');
                     });
 
@@ -275,7 +275,7 @@ define([
                     .add('custom', {
                         src: ['script4.js', 'script1.js', 'script2.js', 'script14.js']
                     })
-                    .injectScript({src: 'script4'}, function() {
+                    .insertScript({src: 'script4'}, function() {
                         // signal to the test window that we're done
                         window.parent.postMessage('loaded', '*');
                     });
@@ -296,6 +296,20 @@ define([
                 $('body').append(scripts);
             });
 
+            it('adds external script at the correct position', function() {
+                descript
+                    .add('custom', {
+                        src: ['script4.js', 'script1.js']
+                    })
+                    .insertScript({src: 'script4'}, 'external-script.js');
+
+                var $externalScript = descript.get('custom').eq(2);
+                var src = $externalScript.attr('x-src');
+
+                expect(src).to.be.defined;
+                expect(src).to.equal('external-script.js');
+            });
+
             it('throws when searchType contains multiple types', function() {
                 descript
                     .add('custom', {
@@ -303,7 +317,7 @@ define([
                     });
 
                 expect(function() {
-                    descript.injectScript({
+                    descript.insertScript({
                         src: ['script1'],
                         contains: [contains.alertPattern]
                     }, 'alert', 'console.log');
@@ -317,7 +331,7 @@ define([
                     });
 
                 expect(function() {
-                    descript.injectScript({ contains: [contains.alertPattern, 'console'] }, 'alert', 'console.log');
+                    descript.insertScript({ contains: [contains.alertPattern, 'console'] }, 'alert', 'console.log');
                 }).to.throw(MULTIPLE_SEARCH_PATTERNS_ERROR);
             });
         });
@@ -402,6 +416,31 @@ define([
                 var $patternScripts = descript.get('patterns');
 
                 expect($patternScripts).to.have.length(1);
+            });
+        });
+    });
+
+    describe('Descript with preserve', function() {
+        beforeEach(function(done) {
+            var setUpComplete = function(iFrame$, dependencies) {
+                $ = iFrame$;
+                Descript = dependencies.Descript;
+
+                done();
+            };
+
+            testSandbox.setUp('sandbox', setUpComplete);
+        });
+
+        describe('init', function() {
+            it('preserves specified scripts', function() {
+                descript = Descript.init({
+                    preserve: {
+                        contains: 'www.googletagmanager.com'
+                    }
+                });
+
+                expect(descript.get('default')).to.have.length(16);
             });
         });
     });

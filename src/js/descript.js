@@ -19,8 +19,12 @@
         regex: function($script, query) {
             var src = $script.attr('x-src');
 
-            return src && Object.prototype.toString.call(query) === '[object RegExp]' && query.test(src);
+            return src && $.type(query) === 'regexp' && query.test(src);
         }
+    };
+
+    var DEFAULT_OPTIONS = {
+        preserve: null
     };
 
     var removeItem = function(array, index) {
@@ -34,34 +38,26 @@
      * all the scripts on the page.
      * @constructor
      */
-    var Descript = function() {
+    var Descript = function(options) {
         if (Descript.prototype._instance) {
             return Descript.prototype._instance;
         }
 
         Descript.prototype._instance = this;
 
-        this._scripts = $('script[x-src], script[type="text/mobify-script"]')
-                            // we remove all the scripts from the DOM so we can manipulate them before adding them back in
-                            .remove()
-                            .map(function(_, script) {
-                                var $script = $(script);
+        this.options = $.extend(true, {}, DEFAULT_OPTIONS, options);
 
-                                return {
-                                    container: DEFAULT_CONTAINER,
-                                    $script: $script
-                                };
-                            })
-                            .get();
         this.searchers = DEFAULT_SEARCHERS;
+
+        this._buildDefaultContainer();
     };
 
     /**
      * Initializes descript, ensuring a Singleton instance.
      * @returns {*|Descript}
      */
-    Descript.init = function() {
-        return Descript.prototype._instance || new Descript();
+    Descript.init = function(options) {
+        return Descript.prototype._instance || new Descript(options);
     };
 
     /**
@@ -132,21 +128,32 @@
     };
 
     /**
-     * Injects a script into the container specified by `container`. In terms of position, the
-     * injected script is added directly after the script defined in `searchType`. The injected
-     * script is added as an inline script.
+     * Inserts a script into the container specified by `container`. In terms of position, the
+     * inserted script is added directly after the script defined in `searchType`.
+     *
+     * If a function is provided for the scriptToInsert parameter, the script is added as an
+     * inline script. If a string is provided, the script is inserted as an external script.
      * @param searchType
-     * @param scriptToInject
+     * @param scriptToInsert
      */
-    Descript.prototype.injectScript = function(searchType, scriptToInject) {
+    Descript.prototype.insertScript = function(searchType, scriptToInsert) {
         var script = this._find(searchType);
+        var _getScript = function() {
+            var $script = $('<script />');
+
+            if ($.type(scriptToInsert) === 'function') {
+                return $script
+                    .attr('type', 'text/mobify-script')
+                    .text('(' + scriptToInsert.toString() + ')();')[0];
+            } else {
+                return $script.attr('x-src', scriptToInsert);
+            }
+        };
 
         if (script) {
             this._scripts.splice(script.index + 1, 0, {
                 container: script.script.container,
-                $script: $('<script />')
-                    .attr('type', 'text/mobify-script')
-                    .html('(' + scriptToInject.toString() + ')();')[0]
+                $script: _getScript()
             });
         }
     };
@@ -186,8 +193,31 @@
         this.searchers[name] = searcher;
     };
 
+    Descript.prototype._buildDefaultContainer = function() {
+        this._scripts = $('script[x-src], script[type="text/mobify-script"]')
+            .map(function(_, script) {
+                var $script = $(script);
+
+                return {
+                    container: DEFAULT_CONTAINER,
+                    $script: $script
+                };
+            })
+            .get();
+
+        if (this.options.preserve) {
+            this.remove(this.options.preserve);
+        }
+
+        for (var i = 0; i < this._scripts.length; i++) {
+            var $script = this._scripts[i].$script;
+
+            this._scripts[i].$script = $script.remove();
+        }
+    };
+
     Descript.prototype._getSearchPatterns = function(searchType) {
-        if (typeof searchType === 'string') {
+        if ($.type(searchType) === 'string') {
             if (searchType.indexOf(',') >= 0) {
                 return searchType.replace(/\s/, '').split(',');
             }
