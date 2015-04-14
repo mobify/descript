@@ -98,7 +98,7 @@ Search types are supplied via an **object**, where the key is the **search type*
 In the example below, we're using the `src` search type, and the pattern is `jquery.ui`.
 
 ```js
-{ src: 'jquery.ui' }
+{ src: 'jquery-ui' }
 ```
 
 This will match the following:
