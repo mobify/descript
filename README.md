@@ -193,6 +193,86 @@ And ultimately use in your dust template:
 {scripts.default}
 ```
 
+## Methods
+
+### add
+
+Adds a script to a custom container.
+
+| Parameter name | Description |
+|----------------|-------------|
+| **container** | The container to add the script to |
+| **searchType** | An object containing one or more search types and one or more script patterns for each type | 
+
+```js
+descript
+  .add('urgent', {
+    src: ['script1.js', 'script2.js'],
+    contains: 'somescript.init'
+  })
+  .add('defer', {
+    src: ['script4.js']
+  });
+```
+
+### remove
+
+Removes a script from the default container.
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searchType** | An object containing one or more search types and one or more script patterns for each type | 
+
+```js
+descript.remove({ src: 'jquery' });
+```
+
+### insertScript
+
+Inserts a script after the script specified by `searchType`
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searchType** | An object containing one search type and one script pattern |
+| **scriptToInsert** | A string (representing an src attribute path) or a function (representing the contents of an inline script) |
+
+```js
+// inserts an external script
+descript.insertScript({src: 'script4.js'}, 'someExternal.js');
+```
+
+or
+
+```js
+// inserts an inline script
+descript.insertScript({src: 'script4.js'}, function() {
+  // do some overrides in here
+);
+```
+
+### replace
+
+Replaces the contents of an inline script specified by `searchType`
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searchType** | An object containing one search type and one script pattern |
+| **pattern** | A string (representing the pattern to find) or an object (representing a has of pattern/replacement pairs) |
+| **replacement** | If pattern is a string, this represents the replacement string |
+
+```js
+descript.replace({contains: 'google'}, 'alert', 'console.log');
+```
+
+or 
+
+
+```js
+descript.replace({contains: 'google'}, {
+	pattern: 'alert', replacement: 'console.log',
+	pattern: 'hi', replacement: 'bye'
+});
+```
 
 ### Grunt Tasks
 
