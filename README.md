@@ -27,7 +27,7 @@ descript.init();
 
 ### Preserve scripts in the DOM
 
-If you need to preserve scripts in the DOM in a certain position (i.e. you want descript to leave your scripts alone), you can specify a `preserve` option when initializing:
+If you need to preserve scripts in the DOM in a certain position (i.e. you want descript to leave certain scripts alone), you can specify a `preserve` option when initializing:
 
 ```js
 descript.init({
@@ -129,9 +129,9 @@ This will match the following:
 
 Patterns can be either:
 
-1. A single string or regex pattern, i.e. 'script1' or /script1/ or /script\d/
-2. A string of comma separated patterns, i.e. 'script1, script2'
-3. An array of string or regex patterns, i.e. ['script1', 'script2'] or [/script1/, /script2/]
+1. A single string or regex pattern, i.e. `'script1'` or `/script1/` or `/script\d/`
+2. A string of comma separated patterns, i.e. `'script1, script2'`
+3. An array of string or regex patterns, i.e. `['script1', 'script2']` or `[/script1/, /script2/]`
 
 Internally descript will **normalize** these values into an array of patterns.
 
