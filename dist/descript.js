@@ -23,12 +23,6 @@
         }
     };
 
-    var removeItem = function(array, index) {
-        var rest = array.slice(index + 1 || array.length);
-        array.length = index < 0 ? array.length + index : index;
-        return array.push.apply(array, rest);
-    };
-
     /**
      * Initializes descript with a default container containing
      * all the scripts on the page.
@@ -122,10 +116,10 @@
      * @returns {Descript}
      */
     Descript.prototype.remove = function(searchTypes) {
-        var scripts = this._scripts;
+        var self = this;
 
         this._each(searchTypes, function(scriptItemIndex) {
-            removeItem(scripts, scriptItemIndex);
+            self._removeScript(scriptItemIndex);
         });
 
         return this;
@@ -246,7 +240,7 @@
      * @private
      */
     Descript.prototype._getSearchPatterns = function(searchType) {
-        if ($.type(searchType) === 'regex') {
+        if ($.type(searchType) === 'regexp') {
             return [searchType];
         }
 
@@ -259,6 +253,14 @@
         }
 
         return searchType;
+    };
+
+    Descript.prototype._removeScript = function(index) {
+        var scripts = this._scripts;
+        var rest = scripts.slice(index + 1 || scripts.length);
+
+        scripts.length = index < 0 ? scripts.length + index : index;
+        this._scripts = scripts.push.apply(scripts, rest);
     };
 
     /**
