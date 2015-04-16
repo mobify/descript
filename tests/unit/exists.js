@@ -1,7 +1,7 @@
 define([
     'test-sandbox'
 ], function(testSandbox) {
-    var Descript;`
+    var Descript;
     var descript;
     var $;
 
