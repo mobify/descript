@@ -25,7 +25,22 @@ Initialize it in your view:
 descript.init();
 ```
 
+### Preserve scripts in the DOM
+
+If you need to preserve scripts in the DOM in a certain position (i.e. you want descript to leave your scripts alone), you can specify a `preserve` option when initializing:
+
+```js
+descript.init({
+	preserve: {
+		src: 'leaveThisScript.js',
+		contains: ['leave', 'these', 'too']
+	}
+});
+```
+
 The `init` method creates a singleton instance, so subsequent calls will simply return the same instance. This is particularly useful if you need to manipulate scripts in a specific view in addition to the base view.
+
+### Add to containers
 
 After initializing you can then use descript to add scripts to different containers, using patterns that match either `src` attributes (or `x-src` in the case of a captured document) for external scripts, or string patterns for inline scripts:
 
@@ -40,13 +55,17 @@ descript
   });
 ```
 
-Or, you can remove scripts entirely:
+### Removing scripts
+
+You can also remove scripts entirely:
 
 ```js
 descript.remove({
   src: ['jquery']
 });
 ```
+
+### Getting scripts
 
 To get scripts within a specific container, use the `get` function, which returns a wrapped set of scripts:
 
@@ -62,10 +81,20 @@ var $allScripts = descript.getAll();
 
 which will return an object of key/value pairs containing the containers, by name, and the wrapped set of scripts for each container.
 
-If you need to inject a script at a specific location, to proxy or override a function for example, you can do this using the `injectScript` function.
+### Inserting scripts at a specific location
+
+If you need to insert a script at a specific location, to proxy or override a function for example, you can do this using the `insertScript` function. The second parameter to `insertScript` can be either a `string` representing the `src` attribute of an external script, or a `function` representing the contents of an inline script.
 
 ```js
-descript.injectScript({src: 'script4.js'}, function() {
+// inserts an external script
+descript.insertScript({src: 'script4.js'}, 'someExternal.js');
+```
+
+or
+
+```js
+// inserts an inline script
+descript.insertScript({src: 'script4.js'}, function() {
   // do some overrides in here
 );
 ```
@@ -79,7 +108,7 @@ Search types are supplied via an **object**, where the key is the **search type*
 In the example below, we're using the `src` search type, and the pattern is `jquery.ui`.
 
 ```js
-{ src: 'jquery.ui' }
+{ src: 'jquery-ui' }
 ```
 
 This will match the following:
@@ -137,7 +166,7 @@ descript
 
 ## Using descript in your dust template
 
-Once you've added, removed, and injected to your heart's content, you will want to output the manipulated scripts in your dust template. To do so, you'll want to retreive all the script containers and attach them to your context.
+Once you've added, removed, and inserted to your heart's content, you will want to output the manipulated scripts in your dust template. To do so, you'll want to retreive all the script containers and attach them to your context.
 
 ```js
 
@@ -174,6 +203,86 @@ And ultimately use in your dust template:
 {scripts.default}
 ```
 
+## Methods
+
+### `add`
+
+Adds a script to a custom container.
+
+| Parameter name | Description |
+|----------------|-------------|
+| **container** | The container to add the script to |
+| **searchType** | An object containing one or more search types and one or more script patterns for each type | 
+
+```js
+descript
+  .add('urgent', {
+    src: ['script1.js', 'script2.js'],
+    contains: 'somescript.init'
+  })
+  .add('defer', {
+    src: ['script4.js']
+  });
+```
+
+### `remove`
+
+Removes a script from the default container.
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searchType** | An object containing one or more search types and one or more script patterns for each type | 
+
+```js
+descript.remove({ src: 'jquery' });
+```
+
+### `insertScript`
+
+Inserts a script after the script specified by `searchType`
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searchType** | An object containing one search type and one script pattern |
+| **scriptToInsert** | A string (representing an src attribute path) or a function (representing the contents of an inline script) |
+
+```js
+// inserts an external script
+descript.insertScript({src: 'script4.js'}, 'someExternal.js');
+```
+
+or
+
+```js
+// inserts an inline script
+descript.insertScript({src: 'script4.js'}, function() {
+  // do some overrides in here
+);
+```
+
+### `replace`
+
+Replaces the contents of an inline script specified by `searchType`
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searchType** | An object containing one search type and one script pattern |
+| **pattern** | A string (representing the pattern to find) or an object (representing a has of pattern/replacement pairs) |
+| **replacement** | If pattern is a string, this represents the replacement string |
+
+```js
+descript.replace({contains: 'google'}, 'alert', 'console.log');
+```
+
+or 
+
+
+```js
+descript.replace({contains: 'google'}, {
+	pattern: 'alert', replacement: 'console.log',
+	pattern: 'hi', replacement: 'bye'
+});
+```
 
 ### Grunt Tasks
 
