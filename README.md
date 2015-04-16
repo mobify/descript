@@ -3,6 +3,7 @@
 Manage desktop scripts in a simple way in Adaptive.js
 
 [![Bower version](https://badge.fury.io/bo/descript.svg)](http://badge.fury.io/bo/descript)
+[![Dependency Status](https://www.versioneye.com/user/projects/5530249e10e7141211000b91/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5530249e10e7141211000b91)
 [![Circle CI](https://circleci.com/gh/mobify/descript.svg?style=shield&circle-token=ef84781d06c021badc882f227815b8e790de3dcb)](https://circleci.com/gh/mobify/descript)
 
 **Descript** allows you to manage scripts captured from the desktop site's HTML from within your Adaptive.js views. It provides some simple features, such as:
