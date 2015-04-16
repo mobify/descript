@@ -7,7 +7,8 @@ require.config({
         '$': 'lib/zeptojs/dist/zepto',
         'chai': 'node_modules/chai/chai',
         'mocha': 'node_modules/mocha/mocha',
-        'test-sandbox': 'tests/utils/test-sandbox'
+        'test-sandbox': 'tests/utils/test-sandbox',
+        'common': 'tests/utils/common'
     },
     'shim': {
         'mocha': {

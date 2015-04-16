@@ -128,6 +128,14 @@
     };
 
     /**
+     * Determines whether a specific script exists.
+     * @returns {boolean}
+     */
+    Descript.prototype.exists = function(searchType) {
+        return !!this._find(searchType);
+    };
+
+    /**
      * Inserts a script into the container specified by `container`. In terms of position, the
      * inserted script is added directly after the script defined in `searchType`.
      *
@@ -193,6 +201,10 @@
         this.searchers[name] = searcher;
     };
 
+    /**
+     * Builds the default script container during initialization.
+     * @private
+     */
     Descript.prototype._buildDefaultContainer = function() {
         this._scripts = $('script[x-src], script[type="text/mobify-script"]')
             .map(function(_, script) {
@@ -216,6 +228,19 @@
         }
     };
 
+    /**
+     * Normalizes search type values into an array.
+     *
+     * Valid search types are:
+     *
+     * 1. strings containing a single pattern, i.e. 'script1'
+     * 2. strings containing multiple, comma separated patterns, i.e. 'script1, script2'
+     * 3. arrays containing multiple patterns i.e. ['script1', 'script2']
+     *
+     * @param searchType
+     * @returns {*}
+     * @private
+     */
     Descript.prototype._getSearchPatterns = function(searchType) {
         if ($.type(searchType) === 'string') {
             if (searchType.indexOf(',') >= 0) {
