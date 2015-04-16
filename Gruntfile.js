@@ -33,7 +33,8 @@ module.exports = function(grunt) {
         'grunt-contrib-copy',
         'grunt-concurrent',
         'grunt-open',
-        'grunt-contrib-uglify'
+        'grunt-contrib-uglify',
+        'grunt-version'
     ];
 
     npmTasks.forEach(function(taskName) {
@@ -42,7 +43,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('build', ['lint:dev', 'copy', 'uglify']);
+    grunt.registerTask('build', ['lint:dev', 'copy', 'uglify', 'version:all']);
     grunt.registerTask('test', ['build', 'connect:test', 'mocha_phantomjs']);
     grunt.registerTask('test:browser', ['build', 'concurrent:tests']);
     grunt.registerTask('default', 'build');

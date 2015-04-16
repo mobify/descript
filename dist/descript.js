@@ -42,6 +42,8 @@
         this._buildDefaultContainer();
     };
 
+    Descript.VERSION = '1.0.0';
+
     /**
      * Default options
      * @type {{preserve: null}}
@@ -260,7 +262,7 @@
         var rest = scripts.slice(index + 1 || scripts.length);
 
         scripts.length = index < 0 ? scripts.length + index : index;
-        this._scripts = scripts.push.apply(scripts, rest);
+        scripts.push.apply(scripts, rest);
     };
 
     /**

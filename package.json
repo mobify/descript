@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/mobify/descript"
   },
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Utility for managing and prioritizing scripts",
   "devDependencies": {
     "chai": "~1.9.0",
@@ -23,5 +23,8 @@
     "mocha": "~1.14.0",
     "requirejs-glob": "git+ssh://git@github.com:mobify/requirejs-glob.git"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "grunt-version": "^1.0.0"
+  }
 }

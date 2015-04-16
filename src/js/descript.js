@@ -42,6 +42,8 @@
         this._buildDefaultContainer();
     };
 
+    Descript.VERSION = '0';
+
     /**
      * Default options
      * @type {{preserve: null}}
