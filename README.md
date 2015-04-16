@@ -101,6 +101,16 @@ descript.insertScript({src: 'script4.js'}, function() {
 
 This will inject an inline script immediately after the script defined in the script attribute. So, in the above case, the function passed in will be injected immediately following the script that has a `src` attribute containing `script4.js`.
 
+### Testing for the existence of scripts
+
+At times it may be necessary to test for the existence of certain scripts. To do this you can use the `exists` function.
+
+```js
+if (!descript.exists({src: 'someScript'})) {
+	descript.insertScript({src: 'script1'}, 'someScript.js');
+}
+```
+
 ## Search Type Structure
 
 Search types are supplied via an **object**, where the key is the **search type** and the value is the **pattern**. 
@@ -282,6 +292,19 @@ descript.replace({contains: 'google'}, {
 	pattern: 'alert', replacement: 'console.log',
 	pattern: 'hi', replacement: 'bye'
 });
+```
+
+### `exists`
+
+Determines the existence of the script specified by `searchType`
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searchType** | An object containing one search type and one script pattern |
+
+```js
+// returns true if the script exists
+descript.exists({src: 'script4.js'});
 ```
 
 ### Grunt Tasks
