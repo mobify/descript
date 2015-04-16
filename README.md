@@ -113,7 +113,7 @@ if (!descript.exists({src: 'someScript'})) {
 
 ## Search Type Structure
 
-Search types are supplied via an **object**, where the key is the **search type** and the value is the **pattern**. 
+Search types are supplied via an **object**, where the key is the **search type** and the value is the **pattern**. The **pattern** can be either a string or regex.
 
 In the example below, we're using the `src` search type, and the pattern is `jquery.ui`.
 
@@ -129,19 +129,19 @@ This will match the following:
 
 Patterns can be either:
 
-1. A single string pattern, i.e. 'script1'
+1. A single string or regex pattern, i.e. 'script1' or /script1/ or /script\d/
 2. A string of comma separated patterns, i.e. 'script1, script2'
-3. An array of patterns, i.e. ['script1', 'script2']
+3. An array of string or regex patterns, i.e. ['script1', 'script2'] or [/script1/, /script2/]
 
 Internally descript will **normalize** these values into an array of patterns.
 
 ## Search Types
 
-There are a few different ways to search for scripts. 
+There are a two different ways to search for scripts. 
 
 ### `src`
 
-Specifying the `src` search type will search the script element's `x-src` attribute to see whether it **contains** the search pattern.
+Specifying the `src` search type will search the script element's `x-src` attribute to see whether it matches the search pattern. If using strings, internally it's using Zepto's contains attribute selector ([x-src*=<pattern>]). If using regex, it matches the pattern.
 
 ```js
 descript
@@ -150,21 +150,9 @@ descript
   });
 ```
 
-### `regex`
-
-If you need more control over the pattern you're searching for, use the regex search type. This search type will also search `x-src` attributes, but will allow for more specific search patterns. 
-
-
-```js
-descript
-  .add('urgent', {
-    regex: [/.*script1\d\.js/]
-  });
-```
-
 ### `contains`
 
-Use the `contains` search type if searching for content in an inline script. 
+Use the `contains` search type if searching for content in an inline script. If using strings, it's using a simple contains using indexOf. If using regex, it matches the pattern.
 
 
 ```js
