@@ -33,13 +33,5 @@ define([
         it('returns false when script doesn\'t exist in default container using contains searcher', function() {
             expect(descript.exists({contains: 'no inline script'})).to.be.false;
         });
-
-        it('returns true when script exists in default container using regex searcher', function() {
-            expect(descript.exists({regex: /.*script\d.*/})).to.be.true;
-        });
-
-        it('returns false when script doesn\'t exist in default container using regex searcher', function() {
-            expect(descript.exists({contains: /no-pattern/})).to.be.false;
-        });
     });
 });

@@ -26,7 +26,7 @@ define([
             expect(descript.get).to.throw;
         });
 
-        it('creates custom container with scripts using src search type', function() {
+        it('creates custom container with scripts using src search type with string', function() {
             descript.add('custom', {
                 src: ['script4', 'script2']
             });
@@ -35,7 +35,7 @@ define([
             expect(customContainer).to.have.length(2);
         });
 
-        it('creates custom container with scripts using contains search type', function() {
+        it('creates custom container with scripts using contains search type with string', function() {
             descript.add('custom', {
                 contains: ['alert(\'hi\'']
             });
@@ -44,13 +44,22 @@ define([
             expect(customContainer).to.have.length(1);
         });
 
-        it('creates custom container with scripts using regex search type', function() {
+        it('creates custom container with scripts using src search type with regex', function() {
             descript.add('custom', {
-                regex: [/.*script\d\.js/]
+                src: [/.*script\d\.js/]
             });
             var customContainer = descript.get('custom');
 
             expect(customContainer).to.have.length(9);
+        });
+
+        it('creates custom container with scripts using contains search type with regex', function() {
+            descript.add('custom', {
+                contains: [/alert\('hi'/]
+            });
+            var customContainer = descript.get('custom');
+
+            expect(customContainer).to.have.length(1);
         });
 
         it('chains calls when adding containers', function() {

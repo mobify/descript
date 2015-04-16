@@ -11,20 +11,16 @@
     var DEFAULT_CONTAINER = 'default';
     var DEFAULT_SEARCHERS = {
         src: function($script, query) {
-            return $script.attr('x-src') && $script.is('[x-src*="' + query + '"]');
-        },
-        contains: function($script, query) {
-            return !$script.attr('x-src') && $script.text().indexOf(query) >= 0;
-        },
-        regex: function($script, query) {
             var src = $script.attr('x-src');
 
-            return src && $.type(query) === 'regexp' && query.test(src);
-        }
-    };
+            return src && ($.type(query) === 'regexp' ? query.test(src) : $script.is('[x-src*="' + query + '"]'));
+        },
+        contains: function($script, query) {
+            var src = $script.attr('x-src');
+            var scriptContents = $script.text();
 
-    var DEFAULT_OPTIONS = {
-        preserve: null
+            return !src && ($.type(query) === 'regexp' ? query.test(scriptContents) : scriptContents.indexOf(query) >= 0);
+        }
     };
 
     var removeItem = function(array, index) {
@@ -45,11 +41,19 @@
 
         Descript.prototype._instance = this;
 
-        this.options = $.extend(true, {}, DEFAULT_OPTIONS, options);
+        this.options = $.extend(true, {}, Descript.DEFAULTS, options);
 
         this.searchers = DEFAULT_SEARCHERS;
 
         this._buildDefaultContainer();
+    };
+
+    /**
+     * Default options
+     * @type {{preserve: null}}
+     */
+    Descript.DEFAULTS = {
+        preserve: null
     };
 
     /**
@@ -242,6 +246,10 @@
      * @private
      */
     Descript.prototype._getSearchPatterns = function(searchType) {
+        if ($.type(searchType) === 'regexp') {
+            return [searchType];
+        }
+
         if ($.type(searchType) === 'string') {
             if (searchType.indexOf(',') >= 0) {
                 return searchType.replace(/\s/, '').split(',');
