@@ -192,6 +192,7 @@
         }
     };
 
+
     /**
      * Adds a new script searcher to match scripts in specific ways, such as by regex
      * @param name
