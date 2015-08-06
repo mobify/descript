@@ -33,10 +33,10 @@ If you need to preserve scripts in the DOM in a certain position (i.e. you want 
 
 ```js
 descript.init({
-	preserve: {
-		src: 'leaveThisScript.js',
-		contains: ['leave', 'these', 'too']
-	}
+    preserve: {
+        src: 'leaveThisScript.js',
+        contains: ['leave', 'these', 'too']
+    }
 });
 ```
 
@@ -109,7 +109,7 @@ At times it may be necessary to test for the existence of certain scripts. To do
 
 ```js
 if (!descript.exists({src: 'someScript'})) {
-	descript.insertScript({src: 'script1'}, 'someScript.js');
+    descript.insertScript({src: 'script1'}, 'someScript.js');
 }
 ```
 
@@ -164,6 +164,39 @@ descript
   });
 ```
 
+### Adding your own searcher
+
+You can add your own searcher
+
+### `descript.addSearcher`
+
+| Parameter name | Description |
+|----------------|-------------|
+| **searcher name** | The name of the searcher |
+| **filter function** | A function that should return **true** or **false**. |
+
+#### `Filter function`
+
+| Parameter name | Description |
+|----------------|-------------|
+| **$script** (argument 1) | The current script to be evalutaed |
+| **query** (argument 2)| The searching criteria |
+
+
+Add a new searcher example:
+
+```js
+descript
+  .addSearcher(
+    'selector',
+    function ($script, query) {
+      return !!$script.filter(query).length;
+    }
+  )
+```
+
+Above searcher will allow script search base on query selectors.
+
 ## Using descript in your dust template
 
 Once you've added, removed, and inserted to your heart's content, you will want to output the manipulated scripts in your dust template. To do so, you'll want to retreive all the script containers and attach them to your context.
@@ -173,25 +206,25 @@ Once you've added, removed, and inserted to your heart's content, you will want 
 var descript;
 
 return {
-	template: template,
-	includes: {
-		header: header,
-		footer: footer
-	},
-	preProcess: function() {
-		descript = Descript.init();
-		
-		descript
-			.add('seusses', {
-				src: ['one-script', 'two-script'],
-				contains: ['red script', 'blue script']
-			})
-			.remove({ src: 'this-script, that-script' });
-	},
-	context: {
-		scripts: descript.getAll(), // attach to context property
-		...
-	}
+    template: template,
+    includes: {
+        header: header,
+        footer: footer
+    },
+    preProcess: function() {
+        descript = Descript.init();
+        
+        descript
+            .add('seusses', {
+                src: ['one-script', 'two-script'],
+                contains: ['red script', 'blue script']
+            })
+            .remove({ src: 'this-script, that-script' });
+    },
+    context: {
+        scripts: descript.getAll(), // attach to context property
+        ...
+    }
 };
 ```
 
@@ -279,8 +312,8 @@ or
 
 ```js
 descript.replace({contains: 'google'}, {
-	pattern: 'alert', replacement: 'console.log',
-	pattern: 'hi', replacement: 'bye'
+    pattern: 'alert', replacement: 'console.log',
+    pattern: 'hi', replacement: 'bye'
 });
 ```
 
