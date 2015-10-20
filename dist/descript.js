@@ -42,7 +42,7 @@
         this._buildDefaultContainer();
     };
 
-    Descript.VERSION = '1.0.0';
+    Descript.VERSION = '1.0.1';
 
     /**
      * Default options
@@ -206,7 +206,7 @@
      * @private
      */
     Descript.prototype._buildDefaultContainer = function() {
-        this._scripts = $('script[x-src], script[type="text/mobify-script"]')
+        this._scripts = $('script')
             .map(function(_, script) {
                 var $script = $(script);
 

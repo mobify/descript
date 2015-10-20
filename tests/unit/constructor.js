@@ -32,7 +32,7 @@ define([
             var defaultContainer = descript.get('default');
 
             expect(defaultContainer).to.be.an('array');
-            expect(defaultContainer).to.have.length(17);
+            expect(defaultContainer).to.have.length(22);
         });
     });
 });
