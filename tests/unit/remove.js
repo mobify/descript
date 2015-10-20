@@ -23,7 +23,7 @@ define([
 
             var defaultContainer = descript.get('default');
 
-            expect(defaultContainer).to.have.length(15);
+            expect(defaultContainer).to.have.length(20);
         });
 
         it('correctly removes specific inline scripts', function() {
@@ -31,7 +31,7 @@ define([
 
             var defaultContainer = descript.get('default');
 
-            expect(defaultContainer).to.have.length(15);
+            expect(defaultContainer).to.have.length(20);
         });
 
         it('correctly removes specific external and inline scripts', function() {
@@ -42,7 +42,7 @@ define([
 
             var defaultContainer = descript.get('default');
 
-            expect(defaultContainer).to.have.length(13);
+            expect(defaultContainer).to.have.length(18);
         });
     });
 });

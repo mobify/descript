@@ -24,7 +24,7 @@ define([
                 }
             });
 
-            expect(descript.get('default')).to.have.length(16);
+            expect(descript.get('default')).to.have.length(21);
         });
     });
 });

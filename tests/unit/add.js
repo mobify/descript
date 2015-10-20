@@ -121,7 +121,7 @@ define([
             var urgentContainer = descript.get('urgent');
             var delayedContainer = descript.get('delayed');
 
-            expect(defaultContainer).to.have.length(13);
+            expect(defaultContainer).to.have.length(18);
             expect(urgentContainer).to.have.length(2);
             expect(delayedContainer).to.have.length(2);
         });
