@@ -311,10 +311,16 @@ or
 
 
 ```js
-descript.replace({contains: 'google'}, {
-    pattern: 'alert', replacement: 'console.log',
-    pattern: 'hi', replacement: 'bye'
-});
+descript.replace({contains: 'google'}, [
+  {
+    pattern: 'alert',
+    replacement: 'console.log'
+  },
+  {
+    pattern: 'hi',
+    replacement: 'bye'
+  }
+]);
 ```
 
 ### `exists`
