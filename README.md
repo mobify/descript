@@ -166,7 +166,7 @@ descript
 
 ### Adding your own searcher
 
-You can add your own searcher
+You can define and add new script searching function with this method like how we have `src` and `contains` search types.
 
 ### `descript.addSearcher`
 
@@ -179,7 +179,7 @@ You can add your own searcher
 
 | Parameter name | Description |
 |----------------|-------------|
-| **$script** (argument 1) | The current script to be evalutaed |
+| **$script** (argument 1) | The current script to be evaluated |
 | **query** (argument 2)| The searching criteria |
 
 
@@ -196,6 +196,17 @@ descript
 ```
 
 Above searcher will allow script search base on query selectors.
+
+Example usage:
+```js
+descript
+  .add('templates', {
+    selector: '.template'  
+  });
+
+// Above will capture any scripts with the following html markup
+<script class="template">...</script>
+```
 
 ## Using descript in your dust template
 
