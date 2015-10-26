@@ -166,7 +166,8 @@ descript
 
 ### Adding your own searcher
 
-You can define and add new script searching function with this method like how we have `src` and `contains` search types.
+In addition to searching by the source filename (`src`) and contents of the 
+script (`contains`), you can define a custom function to filter scripts by.
 
 ### `descript.addSearcher`
 
@@ -195,7 +196,7 @@ descript
   )
 ```
 
-Above searcher will allow script search base on query selectors.
+Above searcher will allow script search based on query selectors.
 
 Example usage:
 ```js
