@@ -37,7 +37,7 @@
 
         this.options = $.extend(true, {}, Descript.DEFAULTS, options);
 
-        this.searchers = DEFAULT_SEARCHERS;
+        this.searchers = $.extend(true, {}, DEFAULT_SEARCHERS, options.searchers);
 
         this._buildDefaultContainer();
     };
